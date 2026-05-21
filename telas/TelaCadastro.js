@@ -247,4 +247,3 @@ const estilos = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
