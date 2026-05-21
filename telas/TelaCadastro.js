@@ -1,15 +1,15 @@
-﻿import React, { useState } from 'react';
+﻿import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { autenticacao } from '../config/firebaseConfig';
 
 export default function TelaCadastro({ navigation }) {
@@ -120,7 +120,9 @@ const estilos = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
+    paddingBottom: 24,
     justifyContent: 'center',
   },
   logoArea: {

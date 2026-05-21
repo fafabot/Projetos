@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { autenticacao } from '../config/firebaseConfig';
 
 export default function TelaLogin({ navigation }) {
@@ -18,105 +18,220 @@ export default function TelaLogin({ navigation }) {
   };
 
   return (
-    <View style={estilos.container}>
-      <Text style={estilos.title}>Login</Text>
+    <KeyboardAvoidingView
+          style={estilos.container}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+          <View style={estilos.backgroundShapeTop} />
+          <View style={estilos.backgroundShapeBottom} />
+    
+          <View style={estilos.content}>
+            <View style={estilos.logoArea}>
+              <View style={estilos.iconWrapper}>
+                <View style={estilos.iconCircle}>
+                  <View style={estilos.crossHorizontal} />
+                  <View style={estilos.crossVertical} />
+                  <View style={estilos.iconInnerCircle} />
+                </View>
+                <View style={estilos.keyStem}>
+                  <View style={estilos.keyTooth} />
+                  <View style={estilos.keyTooth} />
+                </View>
+              </View>
+              <Text style={estilos.title}>KEY FORGE</Text>
+                        <Text style={estilos.subtitle}>SUA CHAVE PARA GRANDES JOGOS</Text>
+                      </View>
+
+      <View style={estilos.form}>
+      <Text style={estilos.label}>E-mail</Text>
       <TextInput
-        style={estilos.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={estilos.input}
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
-      />
+                  style={estilos.input}
+                  placeholder="seu@email.com"
+                  placeholderTextColor="#999"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+      <Text style={estilos.label}>Senha</Text>
+                <TextInput
+                  style={estilos.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#999"
+                  secureTextEntry
+                  value={senha}
+                  onChangeText={setSenha}
+                />
       <TouchableOpacity style={estilos.button} onPress={fazerLogin}>
         <Text style={estilos.buttonText}>Entrar</Text>
       </TouchableOpacity>
       {erro ? <Text style={estilos.erro}>{erro}</Text> : null}
-      <TouchableOpacity style={estilos.linkButton} onPress={() => navigation.navigate('Cadastro')}>
-        <Text style={estilos.buttonText}>Cadastrar</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={estilos.loginRow}>
+                  <Text style={estilos.loginText}>Não possui uma conta? </Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
+                    <Text style={estilos.loginLink}>Cadastre-se</Text>
+                  </TouchableOpacity>
+                </View>
+      </View>
+      </View>
+      </KeyboardAvoidingView>
   );
 }
 
 const estilos = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#070707',
+  },
+  backgroundShapeTop: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: '#7B121B',
+    top: -120,
+    right: -100,
+    opacity: 0.9,
+  },
+  backgroundShapeBottom: {
+    position: 'absolute',
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: '#2C0A0F',
+    bottom: -150,
+    left: -120,
+    opacity: 0.9,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
+    paddingBottom: 24,
+    justifyContent: 'center',
+  },
+  logoArea: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  iconWrapper: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  iconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 2,
+    borderColor: '#ECECEC',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#e8f1ff',
-    padding: 24,
+    backgroundColor: 'rgba(236, 236, 236, 0.08)',
+  },
+  crossHorizontal: {
+    position: 'absolute',
+    width: 38,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#ECECEC',
+  },
+  crossVertical: {
+    position: 'absolute',
+    width: 6,
+    height: 38,
+    borderRadius: 3,
+    backgroundColor: '#ECECEC',
+  },
+  iconInnerCircle: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#070707',
+  },
+  keyStem: {
+    marginTop: -14,
+    width: 16,
+    height: 64,
+    backgroundColor: '#ECECEC',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 10,
+  },
+  keyTooth: {
+    width: 10,
+    height: 10,
+    backgroundColor: '#070707',
+    marginTop: 8,
+    borderRadius: 2,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 28,
-    color: '#0f2f70',
-    textAlign: 'center',
-    letterSpacing: 0.8,
+    color: '#ECECEC',
+    fontSize: 28,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 10,
+  },
+  subtitle: {
+    color: '#BEBFC4',
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+  },
+  form: {
+    width: '100%',
+  },
+  label: {
+    color: '#BABABA',
+    marginBottom: 8,
+    fontSize: 14,
   },
   input: {
-    width: '50%',
-    height: 55,
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    marginBottom: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#121212',
+    color: '#ECECEC',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    marginBottom: 22,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#d9e4ff',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    borderColor: '#1F1F1F',
   },
   button: {
-    width: '50%',
-    height: 55,
-    backgroundColor: '#3d7bff',
-    justifyContent: 'center',
+    backgroundColor: '#9C131B',
+    borderRadius: 14,
+    paddingVertical: 16,
     alignItems: 'center',
-    borderRadius: 30,
-    marginBottom: 12,
-    shadowColor: '#3d7bff',
-    shadowOpacity: 0.25,
+    marginTop: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 4,
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 1,
+    color: '#F9F9F9',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  loginRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 18,
+  },
+  loginText: {
+    color: '#777',
+    fontSize: 14,
+  },
+  loginLink: {
+    color: '#ECECEC',
+    fontSize: 14,
+    fontWeight: '700',
   },
   erro: {
-    color: '#d32f2f',
-    marginTop: 10,
+    color: '#F15A5A',
+    marginBottom: 10,
     textAlign: 'center',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  linkButton: {
-    width: '50%',
-    height: 55,
-    backgroundColor: '#2bbd7e',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 30,
-    marginTop: 10,
-    shadowColor: '#2bbd7e',
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
   },
 });

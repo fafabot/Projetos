@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import TelaLogin from './telas/TelaLogin';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { autenticacao } from './config/firebaseConfig';
 import TelaCadastro from './telas/TelaCadastro';
 import TelaHome from './telas/TelaHome';
-import { onAuthStateChanged } from 'firebase/auth';
-import { autenticacao } from './config/firebaseConfig';
+import TelaLogin from './telas/TelaLogin';
 
 const Camadas = createNativeStackNavigator();
 
@@ -21,7 +21,20 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Camadas.Navigator>
+      <Camadas.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#070707',
+            shadowColor: 'transparent',
+            elevation: 0,
+          },
+          headerTintColor: '#ECECEC',
+          headerTitleStyle: {
+            fontWeight: '600',
+          },
+          contentStyle: { backgroundColor: '#070707' },
+        }}
+      >
         {usuario ? (
           <Camadas.Screen name="Home" component={TelaHome} />
         ) : (
