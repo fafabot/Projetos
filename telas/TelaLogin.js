@@ -1,6 +1,19 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
+
 import { autenticacao } from '../config/firebaseConfig';
 
 export default function TelaLogin({ navigation }) {
@@ -10,80 +23,132 @@ export default function TelaLogin({ navigation }) {
 
   const fazerLogin = async () => {
     try {
-      await signInWithEmailAndPassword(autenticacao, email, senha);
+      await signInWithEmailAndPassword(
+        autenticacao,
+        email,
+        senha
+      );
+
       navigation.navigate('Home');
     } catch (erro) {
+      console.log(erro);
       setErro('Erro ao fazer login. Verifique seus dados.');
     }
   };
 
   return (
-    <KeyboardAvoidingView
-          style={estilos.container}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <SafeAreaView style={estilos.safeArea}>
+      <KeyboardAvoidingView
+        style={estilos.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="#070707"
+        />
+
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
         >
-          <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
           <View style={estilos.backgroundShapeTop} />
           <View style={estilos.backgroundShapeBottom} />
-    
+
           <View style={estilos.content}>
             <View style={estilos.logoArea}>
               <View style={estilos.iconWrapper}>
-                <View style={estilos.iconCircle}>
-                  <View style={estilos.crossHorizontal} />
-                  <View style={estilos.crossVertical} />
-                  <View style={estilos.iconInnerCircle} />
-                </View>
-                <View style={estilos.keyStem}>
-                  <View style={estilos.keyTooth} />
-                  <View style={estilos.keyTooth} />
-                </View>
+                <Image
+                  source={require('../assets/logo.png')}
+                  style={estilos.logo}
+                />
               </View>
-              <Text style={estilos.title}>KEY FORGE</Text>
-                        <Text style={estilos.subtitle}>SUA CHAVE PARA GRANDES JOGOS</Text>
-                      </View>
 
-      <View style={estilos.form}>
-      <Text style={estilos.label}>E-mail</Text>
-      <TextInput
-                  style={estilos.input}
-                  placeholder="seu@email.com"
-                  placeholderTextColor="#999"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={email}
-                  onChangeText={setEmail}
-                />
-      <Text style={estilos.label}>Senha</Text>
-                <TextInput
-                  style={estilos.input}
-                  placeholder="••••••••"
-                  placeholderTextColor="#999"
-                  secureTextEntry
-                  value={senha}
-                  onChangeText={setSenha}
-                />
-      <TouchableOpacity style={estilos.button} onPress={fazerLogin}>
-        <Text style={estilos.buttonText}>Entrar</Text>
-      </TouchableOpacity>
-      {erro ? <Text style={estilos.erro}>{erro}</Text> : null}
-      <View style={estilos.loginRow}>
-                  <Text style={estilos.loginText}>Não possui uma conta? </Text>
-                  <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
-                    <Text style={estilos.loginLink}>Cadastre-se</Text>
-                  </TouchableOpacity>
-                </View>
-      </View>
-      </View>
+              <Text style={estilos.title}>
+                KEY FORGE
+              </Text>
+
+              <Text style={estilos.subtitle}>
+                SUA CHAVE PARA GRANDES JOGOS
+              </Text>
+            </View>
+
+            <View style={estilos.form}>
+              <Text style={estilos.label}>
+                E-mail
+              </Text>
+
+              <TextInput
+                style={estilos.input}
+                placeholder="seu@email.com"
+                placeholderTextColor="#999"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+
+              <Text style={estilos.label}>
+                Senha
+              </Text>
+
+              <TextInput
+                style={estilos.input}
+                placeholder="••••••••"
+                placeholderTextColor="#999"
+                secureTextEntry
+                value={senha}
+                onChangeText={setSenha}
+              />
+
+              {erro ? (
+                <Text style={estilos.erro}>
+                  {erro}
+                </Text>
+              ) : null}
+
+              <TouchableOpacity
+                style={estilos.button}
+                onPress={fazerLogin}
+              >
+                <Text style={estilos.buttonText}>
+                  Entrar
+                </Text>
+              </TouchableOpacity>
+
+              <View style={estilos.loginRow}>
+                <Text style={estilos.loginText}>
+                  Não possui uma conta?
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Cadastro')
+                  }
+                >
+                  <Text style={estilos.loginLink}>
+                    {' '}Cadastre-se
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const estilos = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#070707',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#070707',
   },
+
   backgroundShapeTop: {
     position: 'absolute',
     width: 260,
@@ -94,6 +159,7 @@ const estilos = StyleSheet.create({
     right: -100,
     opacity: 0.9,
   },
+
   backgroundShapeBottom: {
     position: 'absolute',
     width: 320,
@@ -104,134 +170,105 @@ const estilos = StyleSheet.create({
     left: -120,
     opacity: 0.9,
   },
+
   content: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 16,
-    paddingBottom: 24,
+    paddingHorizontal: 20,
+    paddingTop:
+      Platform.OS === 'android'
+        ? StatusBar.currentHeight + 20
+        : 20,
+    paddingBottom: 30,
     justifyContent: 'center',
   },
+
   logoArea: {
     alignItems: 'center',
     marginBottom: 40,
   },
+
   iconWrapper: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 2,
-    borderColor: '#ECECEC',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(236, 236, 236, 0.08)',
-  },
-  crossHorizontal: {
-    position: 'absolute',
-    width: 38,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#ECECEC',
-  },
-  crossVertical: {
-    position: 'absolute',
-    width: 6,
-    height: 38,
-    borderRadius: 3,
-    backgroundColor: '#ECECEC',
-  },
-  iconInnerCircle: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#070707',
-  },
-  keyStem: {
-    marginTop: -14,
-    width: 16,
-    height: 64,
-    backgroundColor: '#ECECEC',
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 10,
-  },
-  keyTooth: {
-    width: 10,
-    height: 10,
-    backgroundColor: '#070707',
-    marginTop: 8,
-    borderRadius: 2,
-  },
-  title: {
-    color: '#ECECEC',
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: 2,
     marginBottom: 10,
   },
+
+  logo: {
+    width: 190,
+    height: 190,
+    resizeMode: 'contain',
+  },
+
+  title: {
+    color: '#ECECEC',
+    fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+
   subtitle: {
     color: '#BEBFC4',
-    fontSize: 12,
+    fontSize: 11,
     textTransform: 'uppercase',
-    letterSpacing: 1.5,
+    letterSpacing: 2,
   },
+
   form: {
     width: '100%',
   },
+
   label: {
-    color: '#BABABA',
+    color: '#E5E5E5',
     marginBottom: 8,
     fontSize: 14,
   },
+
   input: {
     backgroundColor: '#121212',
     color: '#ECECEC',
-    borderRadius: 14,
+    borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 18,
-    marginBottom: 22,
+    marginBottom: 20,
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#1F1F1F',
   },
+
   button: {
-    backgroundColor: '#9C131B',
-    borderRadius: 14,
-    paddingVertical: 16,
+    backgroundColor: '#A5151D',
+    borderRadius: 16,
+    paddingVertical: 17,
     alignItems: 'center',
-    marginTop: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
+    marginTop: 8,
+    elevation: 5,
   },
+
   buttonText: {
-    color: '#F9F9F9',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
+
   loginRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 18,
+    marginTop: 22,
   },
+
   loginText: {
-    color: '#777',
+    color: '#8B8B8B',
     fontSize: 14,
   },
+
   loginLink: {
     color: '#ECECEC',
     fontSize: 14,
     fontWeight: '700',
   },
+
   erro: {
-    color: '#F15A5A',
-    marginBottom: 10,
+    color: '#FF6B6B',
     textAlign: 'center',
+    marginBottom: 10,
   },
 });
