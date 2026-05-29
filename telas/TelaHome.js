@@ -1,101 +1,101 @@
-import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   FlatList,
   Image,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
   Platform,
+  SafeAreaView,
   ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { autenticacao } from '../config/firebaseConfig';
+import { useFavorites } from '../context/FavoritesContext';
 
 const tecnologias = [
   {
     id: '1',
-    nome: 'React Native',
-    descricao: 'Framework para criar apps nativos',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/reactnative-original.png',
+    nome: 'Cuphead',
+    preco: 'R$ 49,90',
+    descricao: 'Plataforma de ação com arte desenhada à mão.',
+    imagem: require('../assets/imagemjogos/cuphead.jpg'),
   },
   {
     id: '2',
-    nome: 'JavaScript',
-    descricao: 'Linguagem da web',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/javascript-original.png',
+    nome: 'Assasins Creed Origins',
+    preco: 'R$ 119,90',
+    descricao: 'Ação e aventura no Egito antigo.',
+    imagem: require('../assets/imagemjogos/assasins creed origins.jpg'),
   },
   {
     id: '3',
-    nome: 'TypeScript',
-    descricao: 'JavaScript com tipagem',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/typescript-original.png',
+    nome: 'God of War Ragnarok',
+    preco: 'R$ 249,90',
+    descricao: 'Ação épica baseada na mitologia nórdica.',
+    imagem: require('../assets/imagemjogos/god of war ragnarol.jpg'),
   },
   {
     id: '4',
-    nome: 'Node.js',
-    descricao: 'Back-end com JavaScript',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/nodejs-original.png',
+    nome: 'Hollow Knight',
+    preco: 'R$ 39,90',
+    descricao: 'Exploração sombria em um mundo de insetos.',
+    imagem: require('../assets/imagemjogos/hollow knight.jpg'),
   },
   {
     id: '5',
-    nome: 'SQL',
-    descricao: 'Banco de dados relacional',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/html5-original.png',
+    nome: 'Red Dead Redemption 2',
+    preco: 'R$ 149,90',
+    descricao: 'Western em mundo aberto com história imersiva.',
+    imagem: require('../assets/imagemjogos/red dead remdepmtion 2.jpg'),
   },
   {
     id: '6',
-    nome: 'Firebase',
-    descricao: 'Backend e autenticação',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/firebase-original.png',
+    nome: 'The Last of Us II',
+    preco: 'R$ 199,90',
+    descricao: 'Aventura emocional em um mundo pós-apocalíptico.',
+    imagem: require('../assets/imagemjogos/the last of us II.jpg'),
   },
   {
     id: '7',
-    nome: 'Python',
-    descricao: 'Data Science e IA',
-    imagem:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/250px-Python-logo-notext.svg.png',
+    nome: 'Resident Evil Biohazard',
+    preco: 'R$ 179,90',
+    descricao: 'Terror de sobrevivência com atmosfera tensa.',
+    imagem: require('../assets/imagemjogos/resident Evil biogazard.jpg'),
+  },
+];
+
+const promocoesEspeciais = [
+  {
+    id: 'p1',
+    nome: 'GTA V',
+    preco: 'R$ 79,90',
+    descricao: 'Ação em mundo aberto e missões intensas.',
+    imagem: require('../assets/imagemjogos/GTA V.jpg'),
   },
   {
-    id: '8',
-    nome: 'CSS',
-    descricao: 'Estilização e layout',
-    imagem:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/CSS3_logo_and_wordmark.svg/960px-CSS3_logo_and_wordmark.svg.png',
+    id: 'p2',
+    nome: 'Minecraft',
+    preco: 'R$ 59,90',
+    descricao: 'Criação e sobrevivência em blocos.',
+    imagem: require('../assets/imagemjogos/minecraft.jpg'),
   },
   {
-    id: '9',
-    nome: 'HTML',
-    descricao: 'Estrutura da web',
-    imagem:
-      'https://washington.pro.br/wp-content/uploads/2026/02/html5-original.png',
-  },
-  {
-    id: '10',
-    nome: 'Docker',
-    descricao: 'Ambientes isolados',
-    imagem:
-      'https://upload.wikimedia.org/wikipedia/commons/1/1e/Docker_Logo.png',
-  },
-  {
-    id: '11',
-    nome: 'Git',
-    descricao: 'Controle de versão',
-    imagem:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Git-logo.svg/1280px-Git-logo.svg.png',
+    id: 'p3',
+    nome: 'Elden Ring',
+    preco: 'R$ 189,90',
+    descricao: 'RPG de ação desafiador em mundo sombrio.',
+    imagem: require('../assets/imagemjogos/elden ring.jpg'),
   },
 ];
 
 export default function TelaHome() {
+  const navigation = useNavigation();
+  const { isFavorite, toggleFavorite } = useFavorites();
+
   const fazerLogout = () => {
     signOut(autenticacao);
   };
@@ -103,10 +103,11 @@ export default function TelaHome() {
   const renderItem = ({ item }) => (
     <View style={estilos.card}>
       <View style={estilos.cardLeft}>
+        
         <Image
-          source={{ uri: item.imagem }}
+          source={item.imagem}
           style={estilos.logo}
-          resizeMode="contain"
+          resizeMode="cover"
         />
 
         <View style={estilos.info}>
@@ -115,16 +116,30 @@ export default function TelaHome() {
           </Text>
 
           <Text style={estilos.descricao}>
-            {item.descricao}
+            {item.preco}
           </Text>
         </View>
       </View>
 
-      <TouchableOpacity style={estilos.botaoInstalar}>
-        <Text style={estilos.textoBotao}>
-          Instalar
-        </Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={estilos.favoriteButton}
+          onPress={() => toggleFavorite(item.id)}
+        >
+          <Text style={[estilos.favoriteIcon, { color: isFavorite(item.id) ? '#E91E63' : '#888' }]}> 
+            {isFavorite(item.id) ? '♥' : '♡'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={estilos.botaoInstalar}
+          onPress={() => navigation.navigate('DetalheProduto', { produto: item })}
+        >
+          <Text style={estilos.textoBotao}>
+            Ver Mais
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -147,43 +162,75 @@ export default function TelaHome() {
           overScrollMode="never"
         >
           <View style={estilos.content}>
-            <View style={estilos.header}>
-              <Image
-                source={require('../assets/logo.png')}
-                style={estilos.logoPrincipal}
-              />
+            <View style={estilos.headerTop}>
+              <View style={estilos.headerInfo}>
+                <Image
+                  source={require('../assets/logo.png')}
+                  style={estilos.logoPrincipal}
+                />
 
-              <Text style={estilos.title}>
-                KEY FORGE
-              </Text>
+                <Text style={estilos.title}>
+                  KEY FORGE
+                </Text>
 
-              <Text style={estilos.subtitle}>
-                SUA BIBLIOTECA DE TECNOLOGIAS
-              </Text>
+                <Text style={estilos.subtitle}>
+                  SUA BIBLIOTECA DE TECNOLOGIAS
+                </Text>
+              </View>
+
+              <View style={estilos.headerRight}>
+                <View style={estilos.userBoxSmall}>
+                  <Text style={estilos.userLabel}>
+                    LOGADO COMO
+                  </Text>
+
+                  <Text style={estilos.userEmail}>
+                    { autenticacao.currentUser?.email}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  style={estilos.logoutButton}
+                  onPress={fazerLogout}
+                >
+                  <Text style={estilos.buttonText}>
+                    Sair da Conta
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <View style={estilos.userBox}>
-              <Text style={estilos.userLabel}>
-                LOGADO COMO
-              </Text>
-
-              <Text style={estilos.userEmail}>
-                {autenticacao.currentUser?.email}
-              </Text>
+            <View style={estilos.promoHeaderRow}>
+              <Text style={estilos.sectionTitle2}>Promoções Especiais</Text>
+              <TouchableOpacity style={estilos.favoritosButton} onPress={() => navigation.navigate('Favoritos')}>
+                <Text style={estilos.favoritosButtonText}>Meus Favoritos</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              style={estilos.button}
-              onPress={fazerLogout}
-            >
-              <Text style={estilos.buttonText}>
-                Sair da Conta
-              </Text>
-            </TouchableOpacity>
+            <View style={estilos.highlightRow}>
+              {promocoesEspeciais.map((item) => (
+                <View style={estilos.highlightItem} key={item.id}>
+                  <TouchableOpacity
+                    style={estilos.highlightCard}
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('DetalheProduto', { produto: item })}
+                  >
+                    <Image
+                      source={item.imagem}
+                      style={estilos.highlightImage}
+                      resizeMode="cover"
+                    />
+                    <Text style={estilos.highlightName}>{item.nome}</Text>
+                    <Text style={estilos.highlightPrice}>{item.preco}</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
 
             <Text style={estilos.sectionTitle}>
-              Tecnologias
+              Em Alta
             </Text>
+
 
             <FlatList
               data={tecnologias}
@@ -257,14 +304,31 @@ const estilos = StyleSheet.create({
         : 20,
   },
 
-  header: {
-    alignItems: 'center',
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 30,
   },
 
+  headerInfo: {
+    flex: 1,
+    paddingRight: 12,
+  },
+
+  headerRight: {
+    alignItems: 'flex-end',
+    width: '36%',
+  },
+
+  header: {
+    alignItems: 'center',
+    marginBottom: 0,
+  },
+
   logoPrincipal: {
-    width: 160,
-    height: 160,
+    width: 120,
+    height: 120,
     resizeMode: 'contain',
     marginBottom: 10,
   },
@@ -293,6 +357,15 @@ const estilos = StyleSheet.create({
     marginBottom: 18,
   },
 
+  userBoxSmall: {
+    backgroundColor: '#121212',
+    borderRadius: 18,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+    marginRight: 12,
+  },
+
   userLabel: {
     color: '#8B8B8B',
     fontSize: 11,
@@ -315,6 +388,16 @@ const estilos = StyleSheet.create({
     elevation: 5,
   },
 
+  logoutButton: {
+    backgroundColor: '#A5151D',
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    marginTop: 8,
+    minWidth: 120,
+  },
+
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -326,6 +409,15 @@ const estilos = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     marginBottom: 18,
+  },
+    sectionTitle2: {
+    color: '#ECECEC',
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 18,
+    alignItems: 'center',
+     justifyContent: 'center',
+     textAlign: 'center',
   },
 
   card: {
@@ -347,13 +439,71 @@ const estilos = StyleSheet.create({
   },
 
   logo: {
-    width: 48,
-    height: 48,
+    width: 68,
+    height: 68,
     marginRight: 14,
   },
 
   info: {
     flex: 1,
+  },
+
+  highlightRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 18,
+  },
+
+  highlightItem: {
+    alignItems: 'center',
+    width: '30%',
+  },
+
+  highlightCard: {
+    width: '100%',
+    height: 180,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#7E7E7E',
+    backgroundColor: '#121212',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 8,
+    padding: 10,
+    overflow: 'hidden',
+  },
+
+  highlightImage: {
+    width: '100%',
+    height: 120,
+    borderRadius: 16,
+  },
+
+  highlightName: {
+     color: '#ECECEC',
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+
+  highlightPrice: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+
+  highlightText: {
+    color: '#4CAF50',
+    fontSize: 11,
+    textAlign: 'center',
+  },
+
+  highlightTitle: {
+    color: '#ECECEC',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 10,
   },
 
   nome: {
@@ -364,7 +514,7 @@ const estilos = StyleSheet.create({
   },
 
   descricao: {
-    color: '#8B8B8B',
+    color: '#4CAF50',
     fontSize: 13,
   },
 
@@ -380,5 +530,34 @@ const estilos = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 13,
+  },
+  image: {
+    width: 48,
+    height: 48,
+    marginRight: 14,
+  },
+  favoriteButton: {
+    marginRight: 10,
+    padding: 6,
+  },
+  favoriteIcon: {
+    fontSize: 32,
+  },
+  favoritosButton: {
+    backgroundColor: '#A5151D',
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    alignSelf: 'flex-start',
+  },
+  favoritosButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  promoHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
 });

@@ -3,9 +3,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { autenticacao } from './config/firebaseConfig';
+import { FavoritesProvider } from './context/FavoritesContext';
 import TelaCadastro from './telas/TelaCadastro';
 import TelaHome from './telas/TelaHome';
 import TelaLogin from './telas/TelaLogin';
+import TelaDetalheProduto from './telas/Teladetalheproduto';
+import TelaFavoritos from './telas/Telafavoritos';
 
 const Camadas = createNativeStackNavigator();
 
@@ -20,7 +23,8 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
+    <FavoritesProvider>
+      <NavigationContainer>
       <Camadas.Navigator
         screenOptions={{
           headerStyle: {
@@ -36,7 +40,11 @@ export default function App() {
         }}
       >
         {usuario ? (
-          <Camadas.Screen name="Home" component={TelaHome} />
+          <>
+            <Camadas.Screen name="Home" component={TelaHome} />
+            <Camadas.Screen name="DetalheProduto" component={TelaDetalheProduto} />
+            <Camadas.Screen name="Favoritos" component={TelaFavoritos} />
+          </>
         ) : (
           <>
             <Camadas.Screen name="Login" component={TelaLogin} />
@@ -44,6 +52,7 @@ export default function App() {
           </>
         )}
       </Camadas.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
+    </FavoritesProvider>
   );
 }
