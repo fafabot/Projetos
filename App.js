@@ -32,7 +32,7 @@ export default function App() {
             shadowColor: 'transparent',
             elevation: 0,
           },
-          headerTintColor: '#ECnpx expo start -cECEC',
+          headerTintColor: '#ECECEC',
           headerTitleStyle: {
             fontWeight: '600',
           },
