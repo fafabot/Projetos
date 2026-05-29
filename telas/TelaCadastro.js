@@ -30,7 +30,6 @@ export default function TelaCadastro({ navigation }) {
         senha
       );
 
-      navigation.navigate('Login');
     } catch (erro) {
       console.log(erro);
       setErro('Erro ao cadastrar. Tente novamente.');

@@ -7,8 +7,8 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import TelaCadastro from './telas/TelaCadastro';
 import TelaHome from './telas/TelaHome';
 import TelaLogin from './telas/TelaLogin';
-import TelaDetalheProduto from './telas/Teladetalheproduto';
-import TelaFavoritos from './telas/Telafavoritos';
+import TelaDetalheProduto from './telas/TelaDetalheProduto';
+import TelaFavoritos from './telas/TelaFavoritos';
 
 const Camadas = createNativeStackNavigator();
 
@@ -32,7 +32,7 @@ export default function App() {
             shadowColor: 'transparent',
             elevation: 0,
           },
-          headerTintColor: '#ECECEC',
+          headerTintColor: '#ECnpx expo start -cECEC',
           headerTitleStyle: {
             fontWeight: '600',
           },

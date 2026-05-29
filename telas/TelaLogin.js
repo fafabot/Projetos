@@ -34,7 +34,6 @@ export default function TelaLogin({ navigation }) {
         senha
       );
 
-      navigation.navigate('Home');
     } catch (erro) {
       console.log(erro);
 
