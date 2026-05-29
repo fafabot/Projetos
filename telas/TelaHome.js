@@ -232,7 +232,7 @@ export default function TelaHome() {
               <TouchableOpacity
                 style={estilos.favoritosButton}
                 onPress={() =>
-                  navigation.navigate('Favoritos')
+                  navigation.navigate('FavoritosTab')
                 }
               >
                 <Text style={estilos.favoritosButtonText}>
