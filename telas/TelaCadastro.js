@@ -1,5 +1,10 @@
-﻿import { createUserWithEmailAndPassword } from 'firebase/auth';
+﻿import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from 'firebase/auth';
+
 import { useState } from 'react';
+
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,7 +21,9 @@ import {
 
 import { autenticacao } from '../config/firebaseConfig';
 
-export default function TelaCadastro({ navigation }) {
+export default function TelaCadastro({
+  navigation,
+}) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -24,15 +31,36 @@ export default function TelaCadastro({ navigation }) {
 
   const fazerCadastro = async () => {
     try {
-      await createUserWithEmailAndPassword(
-        autenticacao,
-        email,
-        senha
+
+      const resposta =
+        await createUserWithEmailAndPassword(
+          autenticacao,
+          email,
+          senha
+        );
+
+      await updateProfile(
+        resposta.user,
+        {
+          displayName: nome,
+        }
       );
 
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000)
+      );
+
+      await autenticacao.currentUser.reload();
+
+      navigation.replace('Main');
+
     } catch (erro) {
+
       console.log(erro);
-      setErro('Erro ao cadastrar. Tente novamente.');
+
+      setErro(
+        'Erro ao cadastrar. Tente novamente.'
+      );
     }
   };
 
@@ -40,7 +68,11 @@ export default function TelaCadastro({ navigation }) {
     <SafeAreaView style={estilos.safeArea}>
       <KeyboardAvoidingView
         style={estilos.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
         <StatusBar
           barStyle="light-content"
@@ -48,15 +80,30 @@ export default function TelaCadastro({ navigation }) {
         />
 
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+          }}
           showsVerticalScrollIndicator={false}
         >
-          <View style={estilos.backgroundShapeTop} />
-          <View style={estilos.backgroundShapeBottom} />
+          <View
+            style={
+              estilos.backgroundShapeTop
+            }
+          />
+
+          <View
+            style={
+              estilos.backgroundShapeBottom
+            }
+          />
 
           <View style={estilos.content}>
+
             <View style={estilos.logoArea}>
-              <View style={estilos.iconWrapper}>
+
+              <View
+                style={estilos.iconWrapper}
+              >
                 <Image
                   source={require('../assets/logo.png')}
                   style={estilos.logo}
@@ -70,9 +117,11 @@ export default function TelaCadastro({ navigation }) {
               <Text style={estilos.subtitle}>
                 CRIE SUA CONTA
               </Text>
+
             </View>
 
             <View style={estilos.form}>
+
               <Text style={estilos.label}>
                 Nome
               </Text>
@@ -123,27 +172,45 @@ export default function TelaCadastro({ navigation }) {
                 style={estilos.button}
                 onPress={fazerCadastro}
               >
-                <Text style={estilos.buttonText}>
+                <Text
+                  style={
+                    estilos.buttonText
+                  }
+                >
                   Cadastrar
                 </Text>
               </TouchableOpacity>
 
-              <View style={estilos.loginRow}>
-                <Text style={estilos.loginText}>
+              <View
+                style={estilos.loginRow}
+              >
+                <Text
+                  style={
+                    estilos.loginText
+                  }
+                >
                   Já possui uma conta?
                 </Text>
 
                 <TouchableOpacity
                   onPress={() =>
-                    navigation.navigate('Login')
+                    navigation.navigate(
+                      'Login'
+                    )
                   }
                 >
-                  <Text style={estilos.loginLink}>
+                  <Text
+                    style={
+                      estilos.loginLink
+                    }
+                  >
                     {' '}Faça login
                   </Text>
                 </TouchableOpacity>
               </View>
+
             </View>
+
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

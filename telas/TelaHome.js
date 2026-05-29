@@ -11,10 +11,21 @@ import {
   View,
 } from 'react-native';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import {
+  useEffect,
+  useState,
+} from 'react';
+
 import { useNavigation } from '@react-navigation/native';
+
 import { signOut } from 'firebase/auth';
+
 import { autenticacao } from '../config/firebaseConfig';
+
 import { useFavorites } from '../context/FavoritesContext';
+
 
 const tecnologias = [
   {
@@ -93,8 +104,37 @@ const promocoesEspeciais = [
 ];
 
 export default function TelaHome() {
+
   const navigation = useNavigation();
-  const { isFavorite, toggleFavorite } = useFavorites();
+
+  const { isFavorite, toggleFavorite } =
+    useFavorites();
+
+  const [nomeUsuario, setNomeUsuario] =
+    useState('Usuário');
+
+  useEffect(() => {
+
+    const atualizarUsuario =
+      async () => {
+
+        if (
+          autenticacao.currentUser
+        ) {
+
+          await autenticacao.currentUser.reload();
+
+          setNomeUsuario(
+            autenticacao.currentUser
+              ?.displayName ||
+              'Usuário'
+          );
+        }
+      };
+
+    atualizarUsuario();
+
+  }, []);
 
   const fazerLogout = () => {
     signOut(autenticacao);
@@ -103,7 +143,12 @@ export default function TelaHome() {
   const renderItem = ({ item }) => (
     <View style={estilos.card}>
       <View style={estilos.cardLeft}>
-        <View style={estilos.imagemContainer}>
+
+        <View
+          style={
+            estilos.imagemContainer
+          }
+        >
           <Image
             source={item.imagem}
             style={estilos.logo}
@@ -112,189 +157,343 @@ export default function TelaHome() {
         </View>
 
         <View style={estilos.info}>
+
           <Text style={estilos.nome}>
             {item.nome}
           </Text>
 
-
-          <View style={estilos.precoContainer}>
-            <Text style={estilos.precoOriginal}>
+          <View
+            style={
+              estilos.precoContainer
+            }
+          >
+            <Text
+              style={
+                estilos.precoOriginal
+              }
+            >
               {item.precoOriginal}
             </Text>
-            <Text style={estilos.descricao}>
+
+            <Text
+              style={estilos.descricao}
+            >
               {item.preco}
             </Text>
           </View>
-          <View style={estilos.cardButtons}>
-              <TouchableOpacity
-                style={estilos.botaoInstalar}
-                onPress={() =>
-                  navigation.navigate('DetalheProduto', {
+
+          <View
+            style={
+              estilos.cardButtons
+            }
+          >
+
+            <TouchableOpacity
+              style={
+                estilos.botaoInstalar
+              }
+              onPress={() =>
+                navigation.navigate(
+                  'DetalheProduto',
+                  {
                     produto: item,
-                  })
+                  }
+                )
+              }
+            >
+              <Text
+                style={
+                  estilos.textoBotao
                 }
               >
-                <Text style={estilos.textoBotao}>
-                  Ver Mais
-                </Text>
-              </TouchableOpacity>
+                Ver Mais
+              </Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={estilos.favoriteButton}
-                onPress={() => toggleFavorite(item.id)}
-              >
-                <Text
-                  style={[
-                    estilos.favoriteIcon,
-                    {
-                      color: isFavorite(item.id)
+            <TouchableOpacity
+              style={
+                estilos.favoriteButton
+              }
+              onPress={() =>
+                toggleFavorite(
+                  item.id
+                )
+              }
+            >
+              <Text
+                style={[
+                  estilos.favoriteIcon,
+                  {
+                    color:
+                      isFavorite(
+                        item.id
+                      )
                         ? '#E91E63'
                         : '#888',
-                    },
-                  ]}
-                >
-                  {isFavorite(item.id) ? '♥' : '♡'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  },
+                ]}
+              >
+                {isFavorite(item.id)
+                  ? '♥'
+                  : '♡'}
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
         </View>
+git 
       </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={estilos.safeArea}>
+    <SafeAreaView
+      style={estilos.safeArea}
+    >
       <StatusBar
         barStyle="light-content"
         backgroundColor="#070707"
       />
 
       <View style={estilos.container}>
-        <View style={estilos.backgroundShapeTop} />
-        <View style={estilos.backgroundShapeMid} />
-        <View style={estilos.backgroundShapeBottom} />
+
+        <View
+          style={
+            estilos.backgroundShapeTop
+          }
+        />
+
+        <View
+          style={
+            estilos.backgroundShapeMid
+          }
+        />
+
+        <View
+          style={
+            estilos.backgroundShapeBottom
+          }
+        />
 
         <ScrollView
           style={estilos.scroll}
-          contentContainerStyle={estilos.scrollContent}
-          showsVerticalScrollIndicator={false}
+          contentContainerStyle={
+            estilos.scrollContent
+          }
+          showsVerticalScrollIndicator={
+            false
+          }
         >
+
           <View style={estilos.content}>
 
             {/* TOPO */}
             <View style={estilos.topBar}>
 
-            <View style={estilos.userBoxSmall}>
-              <Text style={estilos.userLabel}>
-                LOGADO COMO
-              </Text>
-
-              <Text style={estilos.userEmail}>
-                {autenticacao.currentUser?.email}
-              </Text>
-            </View>
-
-            <View style={estilos.rightTopBar}>
-
-                <TouchableOpacity
-                  style={estilos.logoutButton}
-                  onPress={fazerLogout}
+              <View
+                style={
+                  estilos.userBoxSmall
+                }
+              >
+                <Text
+                  style={
+                    estilos.userLabel
+                  }
                 >
-                  <Text style={estilos.buttonText}>
+                  LOGADO COMO
+                </Text>
+
+                <Text
+                  style={
+                    estilos.userEmail
+                  }
+                >
+                  {nomeUsuario}
+                </Text>
+              </View>
+
+              <View
+                style={
+                  estilos.rightTopBar
+                }
+              >
+                <TouchableOpacity
+                  style={
+                    estilos.logoutButton
+                  }
+                  onPress={
+                    fazerLogout
+                  }
+                >
+                  <Text
+                    style={
+                      estilos.buttonText
+                    }
+                  >
                     Sair
                   </Text>
                 </TouchableOpacity>
               </View>
+
             </View>
 
             {/* HEADER */}
-            <View style={estilos.headerCenter}>
+            <View
+              style={
+                estilos.headerCenter
+              }
+            >
+
               <Image
                 source={require('../assets/logo.png')}
-                style={estilos.logoPrincipal}
+                style={
+                  estilos.logoPrincipal
+                }
               />
 
               <Text style={estilos.title}>
                 KEY FORGE
               </Text>
 
-              <Text style={estilos.subtitle}>
-                SUA BIBLIOTECA DE TECNOLOGIAS
+              <Text
+                style={
+                  estilos.subtitle
+                }
+              >
+                SUA BIBLIOTECA DE
+                TECNOLOGIAS
               </Text>
+
             </View>
 
             {/* PROMOÇÕES */}
-            <View style={estilos.promoHeaderRow}>
-              <Text style={estilos.sectionTitle2}>
+            <View
+              style={
+                estilos.promoHeaderRow
+              }
+            >
+
+              <Text
+                style={
+                  estilos.sectionTitle2
+                }
+              >
                 Promoções Especiais
               </Text>
 
               <TouchableOpacity
-                style={estilos.favoritosButton}
+                style={
+                  estilos.favoritosButton
+                }
                 onPress={() =>
+<<<<<<< HEAD
                   navigation.navigate('FavoritosTab')
+=======
+                  navigation.navigate(
+                    'Favoritos'
+                  )
+>>>>>>> 605f0479d27d0e0ed9979d8d38ad1a457e7e6263
                 }
               >
-                <Text style={estilos.favoritosButtonText}>
+                <Text
+                  style={
+                    estilos.favoritosButtonText
+                  }
+                >
                   Meus Favoritos
                 </Text>
               </TouchableOpacity>
+
             </View>
 
             {/* CARDS PROMOÇÃO */}
-            <View style={estilos.highlightRow}>
-              {promocoesEspeciais.map((item) => (
-                <View
-                  style={estilos.highlightItem}
-                  key={item.id}
-                >
-                  <TouchableOpacity
-                    style={estilos.highlightCard}
-                    activeOpacity={0.8}
-                    onPress={() =>
-                      navigation.navigate(
-                        'DetalheProduto',
-                        {
-                          produto: item,
-                        }
-                      )
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={
+                estilos.highlightRow
+              }
+            >
+
+              {promocoesEspeciais.map(
+                (item) => (
+                  <View
+                    style={
+                      estilos.highlightCard
                     }
+                    key={item.id}
                   >
-                    <Image
-                      source={item.imagem}
-                      style={estilos.highlightImage}
-                      resizeMode="cover"
-                    />
+                    <TouchableOpacity
+                      activeOpacity={
+                        0.8
+                      }
+                      onPress={() =>
+                        navigation.navigate(
+                          'DetalheProduto',
+                          {
+                            produto:
+                              item,
+                          }
+                        )
+                      }
+                    >
 
-                    <Text style={estilos.highlightName}>
-                      {item.nome}
-                    </Text>
+                      <Image
+                        source={
+                          item.imagem
+                        }
+                        style={
+                          estilos.highlightImage
+                        }
+                        resizeMode="cover"
+                      />
 
-                    <Text style={estilos.highlightPrice}>
-                      {item.preco}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
+                      <Text
+                        style={
+                          estilos.highlightName
+                        }
+                      >
+                        {item.nome}
+                      </Text>
+
+                      <Text
+                        style={
+                          estilos.highlightPrice
+                        }
+                      >
+                        {item.preco}
+                      </Text>
+
+                    </TouchableOpacity>
+                  </View>
+                )
+              )}
+
+            </ScrollView>
 
             {/* EM ALTA */}
-            <Text style={estilos.sectionTitle}>
+            <Text
+              style={
+                estilos.sectionTitle
+              }
+            >
               Em Alta
             </Text>
 
             <FlatList
               data={tecnologias}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) =>
+                item.id
+              }
               scrollEnabled={false}
-              contentContainerStyle={{
-                paddingBottom: 120,
-              }}
             />
 
           </View>
+
         </ScrollView>
+
       </View>
     </SafeAreaView>
   );
@@ -317,7 +516,8 @@ const estilos = StyleSheet.create({
   },
 
   scrollContent: {
-    flexGrow: 1,
+  flexGrow: 1,
+  paddingBottom: 120,
   },
 
   backgroundShapeTop: {
@@ -332,16 +532,20 @@ const estilos = StyleSheet.create({
   },
 
   backgroundShapeMid: {
-  position: 'absolute',
-  width: 320,
-  height: 320,
-  borderRadius: 160,
-  backgroundColor: '#7B121B',
-  left: -180,
-  top: '50%',
-  transform: [{ translateY: -160 }],
-  opacity: 0.9,
-},
+    position: 'absolute',
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: '#7B121B',
+    left: -180,
+    top: '50%',
+    transform: [
+      {
+        translateY: -160,
+      },
+    ],
+    opacity: 0.9,
+  },
 
   backgroundShapeBottom: {
     position: 'absolute',
@@ -353,7 +557,6 @@ const estilos = StyleSheet.create({
     right: -110,
     opacity: 0.9,
   },
-
 
   content: {
     flex: 1,
@@ -369,12 +572,6 @@ const estilos = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 40,
-  },
-
-  homeText: {
-    color: '#ECECEC',
-    fontSize: 18,
-    fontWeight: '700',
   },
 
   rightTopBar: {
@@ -483,12 +680,10 @@ const estilos = StyleSheet.create({
 
   highlightRow: {
     flexDirection: 'row',
-    marginBottom: 35,
     gap: 14,
-  },
-
-  highlightItem: {
-    width: '35%',
+    paddingBottom: 10,
+    paddingRight: 20,
+    marginBottom: 35,
   },
 
   highlightCard: {
@@ -496,11 +691,12 @@ const estilos = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#2E2E2E',
+    width: 180,
   },
 
   highlightImage: {
     width: '100%',
-    height: 140,
+    height: 180,
     borderRadius: 16,
     marginBottom: 8,
   },
@@ -535,17 +731,17 @@ const estilos = StyleSheet.create({
   },
 
   imagemContainer: {
-  width: 150,
-  height: 150,
-  borderRadius: 10,
-  overflow: 'hidden',
-  marginRight: 14,
-},
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 14,
+  },
 
-logo: {
-  width: '100%',
-  height: '100%',
-},
+  logo: {
+    width: '100%',
+    height: '100%',
+  },
 
   info: {
     flex: 1,
