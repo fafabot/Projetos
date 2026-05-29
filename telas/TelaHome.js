@@ -20,42 +20,49 @@ const tecnologias = [
   {
     id: '1',
     nome: 'Cuphead',
+    precoOriginal: 'R$ 79,90',
     preco: 'R$ 49,90',
     imagem: require('../assets/imagemjogos/cuphead.jpg'),
   },
   {
     id: '2',
     nome: 'Assasins Creed Origins',
+    precoOriginal: 'R$ 199,90',
     preco: 'R$ 119,90',
     imagem: require('../assets/imagemjogos/assasins creed origins.jpg'),
   },
   {
     id: '3',
     nome: 'God of War Ragnarok',
+    precoOriginal: 'R$ 349,90',
     preco: 'R$ 249,90',
     imagem: require('../assets/imagemjogos/god of war ragnarol.jpg'),
   },
   {
     id: '4',
     nome: 'Hollow Knight',
+    precoOriginal: 'R$ 59,90',
     preco: 'R$ 39,90',
     imagem: require('../assets/imagemjogos/hollow knight.jpg'),
   },
   {
     id: '5',
     nome: 'Red Dead Redemption 2',
+    precoOriginal: 'R$ 249,90',
     preco: 'R$ 149,90',
     imagem: require('../assets/imagemjogos/red dead remdepmtion 2.jpg'),
   },
   {
     id: '6',
     nome: 'The Last of Us II',
+    precoOriginal: 'R$ 299,90',
     preco: 'R$ 199,90',
     imagem: require('../assets/imagemjogos/the last of us II.jpg'),
   },
   {
     id: '7',
     nome: 'Resident Evil Biohazard',
+    precoOriginal: 'R$ 229,90',
     preco: 'R$ 179,90',
     imagem: require('../assets/imagemjogos/resident Evil biogazard.jpg'),
   },
@@ -65,18 +72,21 @@ const promocoesEspeciais = [
   {
     id: 'p1',
     nome: 'GTA V',
+    precoOriginal: 'R$ 149,90',
     preco: 'R$ 79,90',
     imagem: require('../assets/imagemjogos/GTA V.jpg'),
   },
   {
     id: 'p2',
     nome: 'Minecraft',
+    precoOriginal: 'R$ 99,90',
     preco: 'R$ 59,90',
     imagem: require('../assets/imagemjogos/minecraft.jpg'),
   },
   {
     id: 'p3',
     nome: 'Elden Ring',
+    precoOriginal: 'R$ 299,90',
     preco: 'R$ 189,90',
     imagem: require('../assets/imagemjogos/elden ring.jpg'),
   },
@@ -93,54 +103,61 @@ export default function TelaHome() {
   const renderItem = ({ item }) => (
     <View style={estilos.card}>
       <View style={estilos.cardLeft}>
-        <Image
-          source={item.imagem}
-          style={estilos.logo}
-          resizeMode="cover"
-        />
+        <View style={estilos.imagemContainer}>
+          <Image
+            source={item.imagem}
+            style={estilos.logo}
+            resizeMode="cover"
+          />
+        </View>
 
         <View style={estilos.info}>
           <Text style={estilos.nome}>
             {item.nome}
           </Text>
 
-          <Text style={estilos.descricao}>
-            {item.preco}
-          </Text>
+
+          <View style={estilos.precoContainer}>
+            <Text style={estilos.precoOriginal}>
+              {item.precoOriginal}
+            </Text>
+            <Text style={estilos.descricao}>
+              {item.preco}
+            </Text>
+          </View>
+          <View style={estilos.cardButtons}>
+              <TouchableOpacity
+                style={estilos.botaoInstalar}
+                onPress={() =>
+                  navigation.navigate('DetalheProduto', {
+                    produto: item,
+                  })
+                }
+              >
+                <Text style={estilos.textoBotao}>
+                  Ver Mais
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={estilos.favoriteButton}
+                onPress={() => toggleFavorite(item.id)}
+              >
+                <Text
+                  style={[
+                    estilos.favoriteIcon,
+                    {
+                      color: isFavorite(item.id)
+                        ? '#E91E63'
+                        : '#888',
+                    },
+                  ]}
+                >
+                  {isFavorite(item.id) ? '♥' : '♡'}
+                </Text>
+              </TouchableOpacity>
+            </View>
         </View>
-      </View>
-
-      <View style={estilos.cardButtons}>
-        <TouchableOpacity
-          style={estilos.favoriteButton}
-          onPress={() => toggleFavorite(item.id)}
-        >
-          <Text
-            style={[
-              estilos.favoriteIcon,
-              {
-                color: isFavorite(item.id)
-                  ? '#E91E63'
-                  : '#888',
-              },
-            ]}
-          >
-            {isFavorite(item.id) ? '♥' : '♡'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={estilos.botaoInstalar}
-          onPress={() =>
-            navigation.navigate('DetalheProduto', {
-              produto: item,
-            })
-          }
-        >
-          <Text style={estilos.textoBotao}>
-            Ver Mais
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -154,6 +171,7 @@ export default function TelaHome() {
 
       <View style={estilos.container}>
         <View style={estilos.backgroundShapeTop} />
+        <View style={estilos.backgroundShapeMid} />
         <View style={estilos.backgroundShapeBottom} />
 
         <ScrollView
@@ -163,24 +181,20 @@ export default function TelaHome() {
         >
           <View style={estilos.content}>
 
-            {/* BARRA SUPERIOR */}
+            {/* TOPO */}
             <View style={estilos.topBar}>
 
-              <Text style={estilos.homeText}>
-                Home
+            <View style={estilos.userBoxSmall}>
+              <Text style={estilos.userLabel}>
+                LOGADO COMO
               </Text>
 
-              <View style={estilos.rightTopBar}>
+              <Text style={estilos.userEmail}>
+                {autenticacao.currentUser?.email}
+              </Text>
+            </View>
 
-                <View style={estilos.userBoxSmall}>
-                  <Text style={estilos.userLabel}>
-                    LOGADO COMO
-                  </Text>
-
-                  <Text style={estilos.userEmail}>
-                    {autenticacao.currentUser?.email}
-                  </Text>
-                </View>
+            <View style={estilos.rightTopBar}>
 
                 <TouchableOpacity
                   style={estilos.logoutButton}
@@ -190,11 +204,10 @@ export default function TelaHome() {
                     Sair
                   </Text>
                 </TouchableOpacity>
-
               </View>
             </View>
 
-            {/* LOGO CENTRAL */}
+            {/* HEADER */}
             <View style={estilos.headerCenter}>
               <Image
                 source={require('../assets/logo.png')}
@@ -228,7 +241,7 @@ export default function TelaHome() {
               </TouchableOpacity>
             </View>
 
-            {/* CARDS DE PROMOÇÃO */}
+            {/* CARDS PROMOÇÃO */}
             <View style={estilos.highlightRow}>
               {promocoesEspeciais.map((item) => (
                 <View
@@ -279,6 +292,7 @@ export default function TelaHome() {
                 paddingBottom: 120,
               }}
             />
+
           </View>
         </ScrollView>
       </View>
@@ -317,16 +331,29 @@ const estilos = StyleSheet.create({
     opacity: 0.9,
   },
 
+  backgroundShapeMid: {
+  position: 'absolute',
+  width: 320,
+  height: 320,
+  borderRadius: 160,
+  backgroundColor: '#7B121B',
+  left: -180,
+  top: '50%',
+  transform: [{ translateY: -160 }],
+  opacity: 0.9,
+},
+
   backgroundShapeBottom: {
     position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 160,
-    backgroundColor: '#2C0A0F',
-    bottom: -150,
-    left: -120,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: '#7B121B',
+    bottom: -140,
+    right: -110,
     opacity: 0.9,
   },
+
 
   content: {
     flex: 1,
@@ -345,7 +372,7 @@ const estilos = StyleSheet.create({
   },
 
   homeText: {
-    color: '#000000',
+    color: '#ECECEC',
     fontSize: 18,
     fontWeight: '700',
   },
@@ -456,12 +483,12 @@ const estilos = StyleSheet.create({
 
   highlightRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 35,
+    gap: 14,
   },
 
   highlightItem: {
-    width: '31%',
+    width: '35%',
   },
 
   highlightCard: {
@@ -469,13 +496,11 @@ const estilos = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#2E2E2E',
-    padding: 10,
-    alignItems: 'center',
   },
 
   highlightImage: {
     width: '100%',
-    height: 120,
+    height: 140,
     borderRadius: 16,
     marginBottom: 8,
   },
@@ -485,22 +510,19 @@ const estilos = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 4,
-    textAlign: 'center',
+    paddingHorizontal: 8,
   },
 
   highlightPrice: {
     color: '#4CAF50',
     fontSize: 13,
     fontWeight: '700',
+    marginBottom: 12,
+    paddingHorizontal: 8,
   },
 
   card: {
-    backgroundColor: '#121212',
-    borderRadius: 18,
-    padding: 16,
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#1F1F1F',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -512,36 +534,51 @@ const estilos = StyleSheet.create({
     flex: 1,
   },
 
-  logo: {
-    width: 68,
-    height: 68,
-    borderRadius: 10,
-    marginRight: 14,
-  },
+  imagemContainer: {
+  width: 150,
+  height: 150,
+  borderRadius: 10,
+  overflow: 'hidden',
+  marginRight: 14,
+},
+
+logo: {
+  width: '100%',
+  height: '100%',
+},
 
   info: {
     flex: 1,
+    flexDirection: 'column',
   },
 
   nome: {
     color: '#ECECEC',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    marginBottom: 6,
+    marginBottom: 16,
+  },
+
+  precoContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
 
   descricao: {
+    fontWeight: '700',
     color: '#4CAF50',
-    fontSize: 14,
+    fontSize: 18,
   },
 
   cardButtons: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: '15%',
   },
 
   favoriteButton: {
-    marginRight: 8,
+    marginLeft: 10,
   },
 
   favoriteIcon: {
@@ -553,11 +590,19 @@ const estilos = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 12,
+    width: '60%',
+    alignItems: 'center',
   },
 
   textoBotao: {
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 13,
+  },
+
+  precoOriginal: {
+    color: '#b40202',
+    fontSize: 12,
+    textDecorationLine: 'line-through',
   },
 });
