@@ -26,9 +26,11 @@ export default function TelaDetalheProduto() {
           )}
 
           <TouchableOpacity style={estilos.favoriteButtonDetail} onPress={() => toggleFavorite(pid)}>
+            <View style={estilos.favoriteBackgroundPromo}>
             <Text style={[estilos.favoriteIconDetail, { color: isFavorite(pid) ? '#E91E63' : '#888' }]}>
               {isFavorite(pid) ? '♥' : '♡'}
             </Text>
+           </View>
           </TouchableOpacity>
 
           <Text style={estilos.detailName}>{produto.nome}</Text>
@@ -191,5 +193,13 @@ const estilos = StyleSheet.create({
     fontWeight: '700',
     fontSize: 14,
   },
-
+  favoriteBackground: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 20,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+     width: 32,
+    height: 32,
+  },
 });

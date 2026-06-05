@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   useEffect,
@@ -220,23 +219,25 @@ export default function TelaHome() {
                 )
               }
             >
-              <Text
-                style={[
-                  estilos.favoriteIcon,
-                  {
-                    color:
-                      isFavorite(
-                        item.id
-                      )
-                        ? '#E91E63'
-                        : '#888',
-                  },
-                ]}
-              >
-                {isFavorite(item.id)
-                  ? '♥'
-                  : '♡'}
-              </Text>
+              <View style={estilos.favoriteBackground}>
+                <Text
+                  style={[
+                    estilos.favoriteIcon,
+                    {
+                      color:
+                        isFavorite(
+                          item.id
+                        )
+                          ? '#E91E63'
+                          : '#888',
+                    },
+                  ]}
+                >
+                  {isFavorite(item.id)
+                    ? '♥'
+                    : '♡'}
+                </Text>
+              </View>
             </TouchableOpacity>
 
           </View>
@@ -459,6 +460,35 @@ export default function TelaHome() {
                         {item.preco}
                       </Text>
 
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={estilos.favoriteButtonPromo}
+                      onPress={() =>
+                        toggleFavorite(
+                          item.id
+                        )
+                      }
+                    >
+                      <View style={estilos.favoriteBackgroundPromo}>
+                        <Text
+                          style={[
+                            estilos.favoriteIconPromo,
+                            {
+                              color:
+                                isFavorite(
+                                  item.id
+                                )
+                                  ? '#E91E63'
+                                  : '#888',
+                            },
+                          ]}
+                        >
+                          {isFavorite(item.id)
+                            ? '♥'
+                            : '♡'}
+                        </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
                 )
@@ -685,7 +715,7 @@ const estilos = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#2E2E2E',
-    width: 180,
+    width: 160,
   },
 
   highlightImage: {
@@ -771,8 +801,41 @@ const estilos = StyleSheet.create({
     marginLeft: 10,
   },
 
+  favoriteBackground: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 20,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+     width: 32,
+    height: 32,
+  },
+
   favoriteIcon: {
     fontSize: 32,
+  },
+
+  favoriteButtonPromo: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 10,
+     width: 28,
+    height: 28,
+  },
+
+  favoriteBackgroundPromo: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 16,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 28,
+    height: 28,
+  },
+
+  favoriteIconPromo: {
+    fontSize: 24,
   },
 
   botaoInstalar: {
