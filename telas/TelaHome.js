@@ -242,7 +242,7 @@ export default function TelaHome() {
           </View>
 
         </View>
-git 
+
       </View>
     </View>
   );
@@ -387,13 +387,7 @@ git
                   estilos.favoritosButton
                 }
                 onPress={() =>
-<<<<<<< HEAD
                   navigation.navigate('FavoritosTab')
-=======
-                  navigation.navigate(
-                    'Favoritos'
-                  )
->>>>>>> 605f0479d27d0e0ed9979d8d38ad1a457e7e6263
                 }
               >
                 <Text

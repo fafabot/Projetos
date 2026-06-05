@@ -35,6 +35,51 @@ export default function TelaDetalheProduto() {
           <Text style={estilos.detailPrice}>{produto.preco ?? produto.descricao}</Text>
           {produto.preco ? <Text style={estilos.detailDescription}>{produto.descricao}</Text> : null}
           <Text style={estilos.installmentText}>em até 12 vezes no cartão sem juros</Text>
+             <TouchableOpacity
+                        style={
+                          estilos.botaoInstalar
+                        }
+                        onPress={() =>
+                          navigation.navigate(
+                            'DetalheProduto',
+                            {
+                              produto: item,
+                            }
+                          )
+                        }
+                      >
+                        <Text
+                          style={
+                            estilos.textoBotao
+                          }
+                        >
+                   Comprar agora 
+                        </Text>
+                      </TouchableOpacity>
+
+
+                             <TouchableOpacity
+                        style={
+                          estilos.botaoInstalar2
+                        }
+                        onPress={() =>
+                          navigation.navigate(
+                            'DetalheProduto',
+                            {
+                              produto: item,
+                            }
+                          )
+                        }
+                      >
+                        <Text
+                          style={
+                            estilos.textoBotao2
+                          }
+                        >
+                        Adicionar ao Carrinho
+                        </Text>
+                      </TouchableOpacity>
+                      
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -108,8 +153,43 @@ const estilos = StyleSheet.create({
     top: 12,
     right: 12,
     padding: 6,
+
+    
   },
   favoriteIconDetail: {
     fontSize: 36,
   },
+    botaoInstalar: {
+       color: '#fff',
+    backgroundColor: '#A5151D',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    width: '68%',
+    alignItems: 'center',
+    margin: '5%',
+   
+  },
+     botaoInstalar2: {
+       color: '#fff',
+    backgroundColor: '#BEBFC4',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    width: '68%',
+    alignItems: 'center',
+  
+   
+  },
+    textoBotao: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+      textoBotao2: {
+    color: '#000000',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+
 });
