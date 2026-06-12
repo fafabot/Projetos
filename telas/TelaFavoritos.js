@@ -1,7 +1,18 @@
+// === IMPORTS ===
 import { useNavigation } from '@react-navigation/native';
-import { FlatList, Image, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+    FlatList,
+    Image,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { useFavorites } from '../context/FavoritesContext';
 
+// === DADOS ===
 const jogos = [
   {
     id: '1',
@@ -68,25 +79,38 @@ const promocoesEspeciais = [
   },
 ];
 
+// === COMPONENTE ===
 export default function TelaFavoritos() {
+  // Hooks
   const navigation = useNavigation();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
-  const todosCargos = [...jogos, ...promocoesEspeciais];
-  const favoritos = todosCargos.filter((jogo) => favorites.includes(jogo.id));
 
+  // Dados
+  const todosProdutos = [...jogos, ...promocoesEspeciais];
+  const favoritos = todosProdutos.filter((jogo) => favorites.includes(jogo.id));
+
+  // Renderização
   return (
     <SafeAreaView style={estilos.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#070707" />
+
+      {/* Header */}
       <View style={estilos.header}>
-        <TouchableOpacity style={estilos.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={estilos.backButton}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={estilos.backText}>Voltar</Text>
         </TouchableOpacity>
         <Text style={estilos.title}>Meus Favoritos</Text>
       </View>
 
+      {/* Conteúdo */}
       {favoritos.length === 0 ? (
         <View style={estilos.emptyContainer}>
-          <Text style={estilos.emptyText}>Você ainda não favoritou nenhum jogo.</Text>
+          <Text style={estilos.emptyText}>
+            Você ainda não favoritou nenhum jogo.
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -95,13 +119,31 @@ export default function TelaFavoritos() {
           contentContainerStyle={estilos.listContent}
           renderItem={({ item }) => (
             <View style={estilos.card}>
-              <Image source={item.imagem} style={estilos.image} resizeMode="cover" />
+              <Image
+                source={item.imagem}
+                style={estilos.image}
+                resizeMode="cover"
+              />
+
               <View style={estilos.info}>
                 <Text style={estilos.name}>{item.nome}</Text>
                 <Text style={estilos.price}>{item.descricao}</Text>
               </View>
-              <TouchableOpacity style={estilos.favoriteButton} onPress={() => toggleFavorite(item.id)}>
-                <Text style={[estilos.favoriteIcon, { color: isFavorite(item.id) ? '#E91E63' : '#888' }]}>♥</Text>
+
+              <TouchableOpacity
+                style={estilos.favoriteButton}
+                onPress={() => toggleFavorite(item.id)}
+              >
+                <Text
+                  style={[
+                    estilos.favoriteIcon,
+                    {
+                      color: isFavorite(item.id) ? '#E91E63' : '#888',
+                    },
+                  ]}
+                >
+                  ♥
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -111,6 +153,7 @@ export default function TelaFavoritos() {
   );
 }
 
+// === ESTILOS ===
 const estilos = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -120,52 +163,61 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1F1F1F',
   },
   title: {
     color: '#ECECEC',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
   },
   backButton: {
     backgroundColor: '#A5151D',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   backText: {
     color: '#FFFFFF',
     fontWeight: '700',
+    fontSize: 13,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
   },
   emptyText: {
     color: '#BEBFC4',
     fontSize: 16,
     textAlign: 'center',
+    lineHeight: 24,
   },
   listContent: {
     paddingHorizontal: 20,
+    paddingVertical: 16,
     paddingBottom: 24,
   },
   card: {
     backgroundColor: '#121212',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: '#1F1F1F',
+    elevation: 2,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
+    width: 90,
+    height: 90,
+    borderRadius: 6,
     marginRight: 14,
   },
   info: {
@@ -180,11 +232,14 @@ const estilos = StyleSheet.create({
   price: {
     color: '#4CAF50',
     fontSize: 14,
+    fontWeight: '600',
   },
   favoriteButton: {
-    padding: 8,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   favoriteIcon: {
-    fontSize: 22,
+    fontSize: 26,
   },
 });
