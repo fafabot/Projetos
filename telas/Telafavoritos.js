@@ -47,10 +47,32 @@ const jogos = [
   },
 ];
 
+const promocoesEspeciais = [
+  {
+    id: 'p1',
+    nome: 'GTA V',
+    descricao: 'R$ 79,90',
+    imagem: require('../assets/imagemjogos/GTA V.jpg'),
+  },
+  {
+    id: 'p2',
+    nome: 'Minecraft',
+    descricao: 'R$ 59,90',
+    imagem: require('../assets/imagemjogos/minecraft.jpg'),
+  },
+  {
+    id: 'p3',
+    nome: 'Elden Ring',
+    descricao: 'R$ 189,90',
+    imagem: require('../assets/imagemjogos/elden ring.jpg'),
+  },
+];
+
 export default function TelaFavoritos() {
   const navigation = useNavigation();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
-  const favoritos = jogos.filter((jogo) => favorites.includes(jogo.id));
+  const todosCargos = [...jogos, ...promocoesEspeciais];
+  const favoritos = todosCargos.filter((jogo) => favorites.includes(jogo.id));
 
   return (
     <SafeAreaView style={estilos.safeArea}>
