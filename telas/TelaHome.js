@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { autenticacao } from '../config/firebaseConfig';
 import { useFavorites } from '../context/FavoritesContext';
@@ -262,8 +262,15 @@ export default function TelaHome() {
             </ScrollView>
 
             {/* Seção Em Alta */}
-            <Text style={estilos.sectionTitle}>Em Alta</Text>
-
+            <View style={estilos.sectionHeaderRow}>
+              <Text style={estilos.sectionTitle}>Em Alta</Text>
+              <TouchableOpacity
+                style={estilos.produtosSectionButton}
+                onPress={() => navigation.navigate('TelaProdutos')}
+              >
+                <Text style={estilos.produtosSectionButtonText}>Mais Jogos</Text>
+              </TouchableOpacity>
+            </View>
             <FlatList
               data={jogos}
               renderItem={renderItem}
@@ -366,7 +373,23 @@ const estilos = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     alignItems: 'center',
-    marginLeft: 10,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  produtosSectionButton: {
+    backgroundColor: '#A5151D',
+    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  produtosSectionButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -417,7 +440,7 @@ const estilos = StyleSheet.create({
   },
   favoritosButton: {
     backgroundColor: '#A5151D',
-    borderRadius: 8,
+    borderRadius: 5,
     paddingVertical: 8,
     paddingHorizontal: 14,
   },
