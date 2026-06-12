@@ -1,14 +1,15 @@
 {
   "expo": {
-    "name": "Android",
-    "slug": "Android",
+    "name": "KeyForge",
+    "slug": "KeyForge",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/favicon_io/android-chrome-192x192.png",
     "scheme": "android",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/favicon_io/apple-touch-icon.png",
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +22,7 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/favicon_io/favicon.ico"
     },
     "plugins": [
       "expo-image"

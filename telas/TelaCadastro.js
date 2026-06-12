@@ -19,6 +19,8 @@ import {
   ScrollView,
 } from 'react-native';
 
+import { MaterialIcons } from '@expo/vector-icons';
+
 import { autenticacao } from '../config/firebaseConfig';
 
 export default function TelaCadastro({
@@ -27,6 +29,7 @@ export default function TelaCadastro({
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
 
   const fazerCadastro = async () => {
@@ -105,7 +108,7 @@ export default function TelaCadastro({
                 style={estilos.iconWrapper}
               >
                 <Image
-                  source={require('../assets/logo.png')}
+                  source={require('../assets/favicon_io/android-chrome-512x512.png')}
                   style={estilos.logo}
                 />
               </View>
@@ -153,14 +156,26 @@ export default function TelaCadastro({
                 Senha
               </Text>
 
-              <TextInput
-                style={estilos.input}
-                placeholder="••••••••"
-                placeholderTextColor="#999"
-                secureTextEntry
-                value={senha}
-                onChangeText={setSenha}
-              />
+              <View style={estilos.senhaContainer}>
+                <TextInput
+                  style={estilos.inputSenha}
+                  placeholder="••••••••"
+                  placeholderTextColor="#999"
+                  secureTextEntry={!mostrarSenha}
+                  value={senha}
+                  onChangeText={setSenha}
+                />
+                <TouchableOpacity
+                  onPress={() => setMostrarSenha(!mostrarSenha)}
+                  style={estilos.iconSenha}
+                >
+                  <MaterialIcons
+                    name={mostrarSenha ? 'visibility' : 'visibility-off'}
+                    size={24}
+                    color="#999"
+                  />
+                </TouchableOpacity>
+              </View>
 
               {erro ? (
                 <Text style={estilos.erro}>
@@ -312,6 +327,28 @@ const estilos = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#1F1F1F',
+  },
+
+  senhaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#121212',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+    marginBottom: 20,
+    paddingHorizontal: 18,
+  },
+
+  inputSenha: {
+    flex: 1,
+    color: '#ECECEC',
+    paddingVertical: 16,
+    fontSize: 16,
+  },
+
+  iconSenha: {
+    padding: 8,
   },
 
   button: {
