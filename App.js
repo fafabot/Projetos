@@ -123,6 +123,7 @@
 
           <Camadas.Navigator
             screenOptions={{
+              headerShown: false,
               headerStyle: {
                 backgroundColor: '#070707',
                 shadowColor: 'transparent',
