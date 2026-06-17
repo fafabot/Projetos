@@ -1,21 +1,21 @@
-  import { NavigationContainer } from '@react-navigation/native';
-  import { createNativeStackNavigator } from '@react-navigation/native-stack';
-  import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
   import { MaterialIcons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
   import { onAuthStateChanged } from 'firebase/auth';
-  import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
   import { autenticacao } from './config/firebaseConfig';
-  import { FavoritesProvider } from './context/FavoritesContext';
+import { FavoritesProvider } from './context/FavoritesContext';
 
-  import TelaCadastro from './telas/TelaCadastro';
-  import TelaHome from './telas/TelaHome';
-  import TelaLogin from './telas/TelaLogin';
-  import TelaDetalheProduto from './telas/TelaDetalheProduto';
-  import TelaFavoritos from './telas/TelaFavoritos';
-  import TelaPerfil from './telas/TelaPerfil';
   import TelaAdmin from './telas/TelaAdmin';
+import TelaCadastro from './telas/TelaCadastro';
+import TelaDetalheProduto from './telas/TelaDetalheProduto';
+import TelaFavoritos from './telas/TelaFavoritos';
+import TelaHome from './telas/TelaHome';
+import TelaLogin from './telas/TelaLogin';
+import TelaPerfil from './telas/TelaPerfil';
 
 
 
