@@ -3,16 +3,16 @@ import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import {
-  FlatList,
-  Image,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    FlatList,
+    Image,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { autenticacao } from '../config/firebaseConfig';
 import { useFavorites } from '../context/FavoritesContext';
@@ -146,12 +146,7 @@ export default function TelaHome() {
                 onPress={() => toggleFavorite(item.id)}
               >
                 <View style={estilos.favoriteBackground}>
-                  <Text
-                    style={[
-                      estilos.favoriteIcon,
-                      { color: isFavorite(item.id) ? '#E91E63' : '#888' },
-                    ]}
-                  >
+                  <Text style={estilos.favoriteIcon}>
                     {isFavorite(item.id) ? '♥' : '♡'}
                   </Text>
                 </View>
@@ -211,7 +206,7 @@ export default function TelaHome() {
               <Text style={estilos.sectionTitle2}>Promoções Especiais</Text>
               <TouchableOpacity
                 style={estilos.favoritosButton}
-                onPress={() => navigation.navigate('FavoritosTab')}
+                onPress={() => navigation.navigate('FavoritosModal')}
               >
                 <Text style={estilos.favoritosButtonText}>Meus Favoritos</Text>
               </TouchableOpacity>
@@ -262,21 +257,23 @@ export default function TelaHome() {
             </ScrollView>
 
             {/* Seção Em Alta */}
-            <View style={estilos.sectionHeaderRow}>
-              <Text style={estilos.sectionTitle}>Em Alta</Text>
-              <TouchableOpacity
-                style={estilos.produtosSectionButton}
-                onPress={() => navigation.navigate('TelaProdutos')}
-              >
-                <Text style={estilos.produtosSectionButtonText}>Mais Jogos</Text>
-              </TouchableOpacity>
+            <View style={estilos.emAltaContainer}>
+              <View style={estilos.sectionHeaderRow}>
+                <Text style={estilos.sectionTitle}>Em Alta</Text>
+                <TouchableOpacity
+                  style={estilos.produtosSectionButton}
+                  onPress={() => navigation.navigate('TelaProdutos')}
+                >
+                  <Text style={estilos.produtosSectionButtonText}>Mais Jogos</Text>
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={jogos}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+              />
             </View>
-            <FlatList
-              data={jogos}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
           </View>
         </ScrollView>
       </View>
@@ -457,10 +454,10 @@ const estilos = StyleSheet.create({
     marginBottom: 35,
   },
   highlightCard: {
-    backgroundColor: '#121212',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#2E2E2E',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     width: 160,
     padding: 8,
   },
@@ -535,16 +532,17 @@ const estilos = StyleSheet.create({
     marginLeft: 10,
   },
   favoriteBackground: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 10,
-    padding: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 12,
+    padding: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
   },
   favoriteIcon: {
-    fontSize: 32,
+    fontSize: 20,
+    color: '#FFFFFF',
   },
   favoriteButtonPromo: {
     position: 'absolute',
@@ -585,10 +583,10 @@ const estilos = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   cardWrapper: {
-    backgroundColor: '#121212',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#2E2E2E',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     marginBottom: 14,
     overflow: 'hidden',
     elevation: 2,

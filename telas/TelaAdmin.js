@@ -1,25 +1,17 @@
 // === IMPORTS ===
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    onSnapshot,
-    updateDoc,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  updateDoc,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+import { useNavigation } from '@react-navigation/native';
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { bancoDados } from '../config/firebaseConfig';
 
@@ -84,6 +76,7 @@ const PRODUTOS_EXEMPLO = [
 // === COMPONENTE ===
 export default function TelaAdmin() {
   // Estado
+  const navigation = useNavigation();
   const [produtos, setProdutos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
@@ -197,6 +190,13 @@ export default function TelaAdmin() {
         const produtosRef = collection(bancoDados, 'produtos');
         await addDoc(produtosRef, { ...payload, createdAt: new Date() });
         Alert.alert('Sucesso', 'Produto cadastrado com sucesso!');
+        // Navegar para a tela de produtos após adicionar
+        try {
+          navigation.navigate('TelaProdutos');
+        } catch (e) {
+          // navigation pode não estar disponível em alguns contextos; ignorar falha
+          console.warn('Navegação para TelaProdutos falhou:', e);
+        }
       }
 
       setNovoProduto(CAMPOS_INICIAIS);
@@ -271,6 +271,9 @@ export default function TelaAdmin() {
         <TouchableOpacity
           style={estilos.botaoDeletar}
           onPress={() => deletarProduto(item.id, item.Produto)}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessible={true}
+          accessibilityLabel={`Deletar ${item.Produto}`}
         >
           <Text style={estilos.textoBotaoDeletar}>🗑️</Text>
         </TouchableOpacity>
@@ -314,7 +317,7 @@ export default function TelaAdmin() {
             style={estilos.botaoEditar}
             onPress={() => iniciarEdicao(item)}
           >
-            <Text style={estilos.textoBotaoEditar}>✏️ Editar</Text>
+            <Text style={estilos.textoBotaoEditar}> Editar</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -341,7 +344,7 @@ export default function TelaAdmin() {
               ? editandoId
                 ? 'Fechar Edição ✖'
                 : 'Fechar Cadastro ✖'
-              : 'Novo Produto ➕'}
+              : 'Novo Produto'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -420,6 +423,18 @@ export default function TelaAdmin() {
             placeholderTextColor="#999"
           />
 
+          {/* Prévia da imagem principal */}
+          {novoProduto.Foto && novoProduto.Foto.trim().length > 0 && (
+            <View style={estilos.previewContainer}>
+              <Image
+                source={{ uri: novoProduto.Foto }}
+                style={estilos.previewImage}
+                resizeMode="cover"
+                onError={() => console.warn('Erro ao carregar preview da imagem')}
+              />
+            </View>
+          )}
+
           <TextInput
             placeholder="URL da Foto 2 (Opcional)"
             style={estilos.input}
@@ -475,7 +490,7 @@ export default function TelaAdmin() {
             onPress={popularProdutosPadrao}
           >
             <Text style={estilos.textoBotaoPopular}>
-              ✨ Gerar Produtos de Exemplo
+               Gerar Produtos de Exemplo
             </Text>
           </TouchableOpacity>
         </View>
@@ -625,6 +640,18 @@ const estilos = StyleSheet.create({
     height: 140,
     backgroundColor: '#1F1F1F',
   },
+  previewContainer: {
+    marginBottom: 12,
+    alignItems: 'center',
+ },
+ previewImage: {
+   width: '100%',
+   height: 160,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2E2E2E',
+    backgroundColor: '#111',
+  },
   botaoDeletar: {
     position: 'absolute',
     top: 8,
@@ -636,6 +663,11 @@ const estilos = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   textoBotaoDeletar: {
     fontSize: 14,

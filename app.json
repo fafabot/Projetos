@@ -4,7 +4,7 @@
     "slug": "KeyForge",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/favicon_io/android-chrome-192x192.png",
+    "icon": "./assets/favicon_io/android-chrome-512x512.png",
     "scheme": "android",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/favicon_io/android-chrome-512x512.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -22,7 +22,7 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/favicon_io/favicon.ico"
+      "favicon": "./assets/favicon_io/favicon-32x32.png"
     },
     "plugins": [
       "expo-image"
