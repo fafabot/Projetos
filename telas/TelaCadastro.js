@@ -1,83 +1,81 @@
-﻿import { createUserWithEmailAndPassword } from 'firebase/auth';
+﻿// === IMPORTS ===
+import { MaterialIcons } from '@expo/vector-icons';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { useState } from 'react';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Image,
-  SafeAreaView,
-  ScrollView,
 } from 'react-native';
-
 import { autenticacao } from '../config/firebaseConfig';
 
+// === COMPONENTE ===
 export default function TelaCadastro({ navigation }) {
+  // Estado
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
 
+  // Funções
   const fazerCadastro = async () => {
     try {
-      await createUserWithEmailAndPassword(
-        autenticacao,
-        email,
-        senha
-      );
+      const resposta = await createUserWithEmailAndPassword(autenticacao, email, senha);
 
-      navigation.navigate('Login');
+      await updateProfile(resposta.user, {
+        displayName: nome,
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      await autenticacao.currentUser.reload();
+
+      navigation.replace('Main');
     } catch (erro) {
       console.log(erro);
       setErro('Erro ao cadastrar. Tente novamente.');
     }
   };
 
+  // Renderização
   return (
     <SafeAreaView style={estilos.safeArea}>
       <KeyboardAvoidingView
         style={estilos.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor="#070707"
-        />
+        <StatusBar barStyle="light-content" backgroundColor="#070707" />
 
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
           <View style={estilos.backgroundShapeTop} />
           <View style={estilos.backgroundShapeBottom} />
 
           <View style={estilos.content}>
+            {/* Logo e Título */}
             <View style={estilos.logoArea}>
               <View style={estilos.iconWrapper}>
                 <Image
-                  source={require('../assets/logo.png')}
+                  source={require('../assets/favicon_io/android-chrome-512x512.png')}
                   style={estilos.logo}
                 />
               </View>
-
-              <Text style={estilos.title}>
-                KEY FORGE
-              </Text>
-
-              <Text style={estilos.subtitle}>
-                CRIE SUA CONTA
-              </Text>
+              <Text style={estilos.title}>KEY FORGE</Text>
+              <Text style={estilos.subtitle}>CRIE SUA CONTA</Text>
             </View>
 
+            {/* Formulário */}
             <View style={estilos.form}>
-              <Text style={estilos.label}>
-                Nome
-              </Text>
-
+              {/* Nome */}
+              <Text style={estilos.label}>Nome</Text>
               <TextInput
                 style={estilos.input}
                 placeholder="Seu nome"
@@ -87,10 +85,8 @@ export default function TelaCadastro({ navigation }) {
                 onChangeText={setNome}
               />
 
-              <Text style={estilos.label}>
-                E-mail
-              </Text>
-
+              {/* Email */}
+              <Text style={estilos.label}>E-mail</Text>
               <TextInput
                 style={estilos.input}
                 placeholder="seu@email.com"
@@ -101,47 +97,42 @@ export default function TelaCadastro({ navigation }) {
                 onChangeText={setEmail}
               />
 
-              <Text style={estilos.label}>
-                Senha
-              </Text>
+              {/* Senha */}
+              <Text style={estilos.label}>Senha</Text>
+              <View style={estilos.senhaContainer}>
+                <TextInput
+                  style={estilos.inputSenha}
+                  placeholder="••••••••"
+                  placeholderTextColor="#999"
+                  secureTextEntry={!mostrarSenha}
+                  value={senha}
+                  onChangeText={setSenha}
+                />
+                <TouchableOpacity
+                  onPress={() => setMostrarSenha(!mostrarSenha)}
+                  style={estilos.iconSenha}
+                >
+                  <MaterialIcons
+                    name={mostrarSenha ? 'visibility' : 'visibility-off'}
+                    size={24}
+                    color="#999"
+                  />
+                </TouchableOpacity>
+              </View>
 
-              <TextInput
-                style={estilos.input}
-                placeholder="••••••••"
-                placeholderTextColor="#999"
-                secureTextEntry
-                value={senha}
-                onChangeText={setSenha}
-              />
+              {/* Erro */}
+              {erro ? <Text style={estilos.erro}>{erro}</Text> : null}
 
-              {erro ? (
-                <Text style={estilos.erro}>
-                  {erro}
-                </Text>
-              ) : null}
-
-              <TouchableOpacity
-                style={estilos.button}
-                onPress={fazerCadastro}
-              >
-                <Text style={estilos.buttonText}>
-                  Cadastrar
-                </Text>
+              {/* Botão Cadastrar */}
+              <TouchableOpacity style={estilos.button} onPress={fazerCadastro}>
+                <Text style={estilos.buttonText}>Cadastrar</Text>
               </TouchableOpacity>
 
+              {/* Link Login */}
               <View style={estilos.loginRow}>
-                <Text style={estilos.loginText}>
-                  Já possui uma conta?
-                </Text>
-
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Login')
-                  }
-                >
-                  <Text style={estilos.loginLink}>
-                    {' '}Faça login
-                  </Text>
+                <Text style={estilos.loginText}>Já possui uma conta?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                  <Text style={estilos.loginLink}> Faça login</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -152,17 +143,16 @@ export default function TelaCadastro({ navigation }) {
   );
 }
 
+// === ESTILOS ===
 const estilos = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#070707',
   },
-
   container: {
     flex: 1,
     backgroundColor: '#070707',
   },
-
   backgroundShapeTop: {
     position: 'absolute',
     width: 260,
@@ -173,7 +163,6 @@ const estilos = StyleSheet.create({
     right: -100,
     opacity: 0.9,
   },
-
   backgroundShapeBottom: {
     position: 'absolute',
     width: 320,
@@ -184,33 +173,25 @@ const estilos = StyleSheet.create({
     left: -120,
     opacity: 0.9,
   },
-
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop:
-      Platform.OS === 'android'
-        ? StatusBar.currentHeight + 20
-        : 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 20,
     paddingBottom: 30,
     justifyContent: 'center',
   },
-
   logoArea: {
     alignItems: 'center',
     marginBottom: 40,
   },
-
   iconWrapper: {
     marginBottom: 10,
   },
-
   logo: {
     width: 190,
     height: 190,
     resizeMode: 'contain',
   },
-
   title: {
     color: '#ECECEC',
     fontSize: 30,
@@ -218,28 +199,24 @@ const estilos = StyleSheet.create({
     letterSpacing: 2,
     marginBottom: 8,
   },
-
   subtitle: {
     color: '#BEBFC4',
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 2,
   },
-
   form: {
     width: '100%',
   },
-
   label: {
     color: '#E5E5E5',
     marginBottom: 8,
     fontSize: 14,
   },
-
   input: {
     backgroundColor: '#121212',
     color: '#ECECEC',
-    borderRadius: 16,
+    borderRadius: 8,
     paddingVertical: 16,
     paddingHorizontal: 18,
     marginBottom: 20,
@@ -247,39 +224,52 @@ const estilos = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1F1F1F',
   },
-
+  senhaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#121212',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+    marginBottom: 20,
+    paddingHorizontal: 18,
+  },
+  inputSenha: {
+    flex: 1,
+    color: '#ECECEC',
+    paddingVertical: 16,
+    fontSize: 16,
+  },
+  iconSenha: {
+    padding: 8,
+  },
   button: {
     backgroundColor: '#A5151D',
-    borderRadius: 16,
+    borderRadius: 8,
     paddingVertical: 17,
     alignItems: 'center',
     marginTop: 8,
     elevation: 5,
   },
-
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
-
   loginRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 22,
   },
-
   loginText: {
     color: '#8B8B8B',
     fontSize: 14,
   },
-
   loginLink: {
     color: '#ECECEC',
     fontSize: 14,
     fontWeight: '700',
   },
-
   erro: {
     color: '#FF6B6B',
     textAlign: 'center',

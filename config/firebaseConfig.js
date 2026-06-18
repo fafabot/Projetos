@@ -1,15 +1,21 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
-const configuracoesFirebase = {
-  apiKey: "AIzaSyDm0LM9EyVZJ2XYfWRZWGk3EF-9wUs7wUo",
-  authDomain: "qualquer-tres.firebaseapp.com",
-  projectId: "qualquer-tres",
-  storageBucket: "qualquer-tres.firebasestorage.app",
-  messagingSenderId: "365336328307",
-  appId: "1:365336328307:web:286a5fc96412b38a939206",
-  measurementId: "G-T7CW8F339V",
+const firebaseConfig = {
+  apiKey: "AIzaSyCa6Lok4m7hqC9FGo5oOHpG58WgcVVNx0o",
+  authDomain: "keyforge-44aa4.firebaseapp.com",
+  projectId: "keyforge-44aa4",
+  storageBucket: "keyforge-44aa4.firebasestorage.app",
+  messagingSenderId: "678938817723",
+  appId: "1:678938817723:web:149243ee01ec6b7d3ae59e"
 };
 
-const app = initializeApp(configuracoesFirebase);
+const app = initializeApp(firebaseConfig);
+
 export const autenticacao = getAuth(app);
+export const bancoDados = getFirestore(app);
+export const armazenamento = getStorage(app);
+
+export default app;
