@@ -1,14 +1,14 @@
 // === IMPORTS ===
 import { useNavigation } from '@react-navigation/native';
 import {
-    FlatList,
-    Image,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useFavorites } from '../context/FavoritesContext';
 
@@ -138,7 +138,7 @@ export default function TelaFavoritos() {
                   style={[
                     estilos.favoriteIcon,
                     {
-                      color: isFavorite(item.id) ? '#E91E63' : '#888',
+                      color: isFavorite(item.id) ? '#E91E63' : '#FFFFFF',
                     },
                   ]}
                 >

@@ -16,8 +16,7 @@ import TelaFavoritos from './telas/TelaFavoritos';
 import TelaHome from './telas/TelaHome';
 import TelaLogin from './telas/TelaLogin';
 import TelaPerfil from './telas/TelaPerfil';
-
-
+import TelaProdutos from './telas/TelaProdutos';
 
   const Camadas = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
@@ -122,6 +121,7 @@ import TelaPerfil from './telas/TelaPerfil';
         <NavigationContainer>
 
           <Camadas.Navigator
+            initialRouteName={usuario ? 'Main' : 'Login'}
             screenOptions={{
               headerShown: false,
               headerStyle: {
@@ -148,6 +148,14 @@ import TelaPerfil from './telas/TelaPerfil';
                   component={BottomTabs}
                   options={{
                     headerShown: false,
+                  }}
+                />
+
+                <Camadas.Screen
+                  name="TelaProdutos"
+                  component={TelaProdutos}
+                  options={{
+                    title: 'Produtos',
                   }}
                 />
 
