@@ -206,9 +206,7 @@ export default function TelaHome() {
               <Text style={estilos.sectionTitle2}>Promoções Especiais</Text>
               <TouchableOpacity
                 style={estilos.favoritosButton}
-                onPress={() => navigation.navigate('FavoritosModal')}
-              >
-                <Text style={estilos.favoritosButtonText}>Meus Favoritos</Text>
+                onPress={() => navigation.navigate('FavoritosModal')}>
               </TouchableOpacity>
             </View>
 
@@ -435,12 +433,7 @@ const estilos = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
   },
-  favoritosButton: {
-    backgroundColor: '#A5151D',
-    borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
+
   favoritosButtonText: {
     color: '#FFFFFF',
     fontWeight: '700',

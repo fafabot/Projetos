@@ -277,25 +277,6 @@ export default function TelaAdmin() {
   }
 };
 
-  const popularProdutosPadrao = async () => {
-    setCarregando(true);
-    try {
-      const produtosRef = collection(bancoDados, 'produtos');
-      for (const prod of PRODUTOS_EXEMPLO) {
-        await addDoc(produtosRef, { ...prod, createdAt: new Date() });
-      }
-      Alert.alert(
-        'Sucesso',
-        'Produtos padrão criados no Firestore para demonstração!'
-      );
-    } catch (erro) {
-      console.error('Erro ao popular produtos:', erro);
-      Alert.alert('Erro', 'Falha ao gerar produtos padrão.');
-    } finally {
-      setCarregando(false);
-    }
-  };
-
   // Renderização
   const renderItem = ({ item }) => {
     console.log('Renderizando item:', { id: item.id, produto: item.Produto }); // DEBUG
@@ -587,17 +568,6 @@ export default function TelaAdmin() {
         </View>
       ) : produtos.length === 0 ? (
         <View style={estilos.semProdutos}>
-          <Text style={estilos.textoSemProdutos}>
-            Nenhum produto cadastrado.
-          </Text>
-          <TouchableOpacity
-            style={estilos.botaoPopular}
-            onPress={popularProdutosPadrao}
-          >
-            <Text style={estilos.textoBotaoPopular}>
-               Gerar Produtos de Exemplo
-            </Text>
-          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -754,18 +724,6 @@ const estilos = StyleSheet.create({
     color: '#BEBFC4',
     textAlign: 'center',
     marginBottom: 20,
-  },
-  botaoPopular: {
-    backgroundColor: '#A5151D',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    elevation: 3,
-  },
-  textoBotaoPopular: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
   },
   lista: {
     padding: 12,
