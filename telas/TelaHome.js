@@ -28,7 +28,7 @@ const tecnologias = [
     id: '2',
     nome: 'Assasins Creed Origins',
     preco: 'R$ 119,90',
-    descricao: 'Ação e aventura no Egito antigo.',
+    descricao: 'Açãoc e aventura no Egito antigo.',
     imagem: require('../assets/imagemjogos/assasins creed origins.jpg'),
   },
   {
