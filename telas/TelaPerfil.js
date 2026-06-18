@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { updateProfile } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -17,7 +16,6 @@ import {
     View,
 } from 'react-native';
 import {
-    armazenamento,
     autenticacao,
     bancoDados,
 } from '../config/firebaseConfig';
@@ -50,16 +48,19 @@ export default function TelaPerfil() {
   useEffect(() => {
     const carregarDados = async () => {
       if (!usuario) {
+        console.log('Usuário não autenticado'); // DEBUG
         setCarregando(false);
         return;
       }
 
+      console.log('Carregando dados do perfil para UID:', usuario.uid); // DEBUG
       const storageKey = `@perfil_usuario_${usuario.uid}`;
 
       // 1. Ler dados do AsyncStorage para exibição instantânea
       try {
         const perfilLocal = await AsyncStorage.getItem(storageKey);
         if (perfilLocal) {
+          console.log('Dados locais encontrados'); // DEBUG
           const dadosLocais = JSON.parse(perfilLocal);
           setPerfil({
             nome: dadosLocais.nome || '',
@@ -81,10 +82,12 @@ export default function TelaPerfil() {
 
       // 2. Buscar dados do Firestore em segundo plano
       try {
+        console.log('Buscando dados no Firestore...'); // DEBUG
         const perfilRef = doc(bancoDados, 'users', usuario.uid);
         const perfilSnap = await getDoc(perfilRef);
 
         if (perfilSnap.exists()) {
+          console.log('Documento encontrado no Firestore:', perfilSnap.data()); // DEBUG
           const dados = perfilSnap.data();
           const novosDados = {
             nome: dados.nome || '',
@@ -95,7 +98,7 @@ export default function TelaPerfil() {
             estado: dados.estado || '',
             cep: dados.cep || '',
             telefone: dados.telefone || '',
-            fotoUrl: dados.fotoUrl || usuario.photoURL || null,
+            fotoBase64: dados.fotoBase64 || null,
           };
 
           setPerfil({
@@ -108,12 +111,13 @@ export default function TelaPerfil() {
             cep: novosDados.cep,
             telefone: novosDados.telefone,
           });
-          setPhotoUrl(novosDados.fotoUrl);
+          setPhotoUrl(novosDados.fotoBase64);
           setEditando(false);
 
           // Atualizar cache local
           await AsyncStorage.setItem(storageKey, JSON.stringify(novosDados));
         } else {
+          console.log('Documento não encontrado no Firestore, criando dados padrão'); // DEBUG
           // Criar dados padrão se não existem
           const [primeiroNome, ...rest] = (usuario.displayName || '').split(' ');
           const dadosPadrao = {
@@ -125,7 +129,7 @@ export default function TelaPerfil() {
             estado: '',
             cep: '',
             telefone: '',
-            fotoUrl: usuario.photoURL || null,
+            fotoBase64: null,
           };
 
           setPerfil({
@@ -138,14 +142,29 @@ export default function TelaPerfil() {
             cep: dadosPadrao.cep,
             telefone: dadosPadrao.telefone,
           });
-          setPhotoUrl(dadosPadrao.fotoUrl);
+          setPhotoUrl(dadosPadrao.fotoBase64);
           setEditando(true);
 
           // Salvar dados padrão no cache
-          await AsyncStorage.setItem(storageKey, JSON.stringify(dadosPadrao));
+          const dadosPadraoComBase64 = {
+            nome: dadosPadrao.nome,
+            sobrenome: dadosPadrao.sobrenome,
+            rua: dadosPadrao.rua,
+            bairro: dadosPadrao.bairro,
+            cidade: dadosPadrao.cidade,
+            estado: dadosPadrao.estado,
+            cep: dadosPadrao.cep,
+            telefone: dadosPadrao.telefone,
+            fotoBase64: null,
+          };
+          await AsyncStorage.setItem(storageKey, JSON.stringify(dadosPadraoComBase64));
         }
       } catch (erro) {
-        console.error('Erro ao buscar dados do Firestore:', erro);
+        console.error('Erro ao buscar dados do Firestore:', {
+          message: erro.message,
+          code: erro.code,
+          stack: erro.stack,
+        }); // DEBUG
         const perfilLocal = await AsyncStorage.getItem(storageKey);
         if (!perfilLocal) {
           Alert.alert('Erro', 'Não foi possível carregar os dados do perfil.');
@@ -170,8 +189,9 @@ export default function TelaPerfil() {
     }
 
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'], // Corrigido: usar array em vez de MediaTypeOptions
       allowsEditing: true,
+      aspect: [1, 1], // Quadrado para perfil
       quality: 0.7,
     });
 
@@ -182,68 +202,134 @@ export default function TelaPerfil() {
     }
   };
 
-  const uploadImageAsync = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const imagemRef = ref(
-      armazenamento,
-      `profilePictures/${usuario.uid}/${Date.now()}`
-    );
-    const snapshot = await uploadBytes(imagemRef, blob);
-    return await getDownloadURL(snapshot.ref);
+  const convertToBase64 = async (uri) => {
+    try {
+      console.log('Convertendo imagem para Base64:', uri); // DEBUG
+      
+      const response = await fetch(uri);
+      if (!response.ok) {
+        throw new Error(`Erro ao ler arquivo: ${response.statusText}`);
+      }
+      
+      const blob = await response.blob();
+      console.log('Blob criado, tamanho:', blob.size); // DEBUG
+      
+      // Converter blob para Base64
+      const reader = new FileReader();
+      
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const base64 = reader.result;
+          console.log('Conversão para Base64 concluída'); // DEBUG
+          resolve(base64);
+        };
+        reader.onerror = (erro) => {
+          console.error('Erro ao ler arquivo:', erro); // DEBUG
+          reject(erro);
+        };
+        reader.readAsDataURL(blob);
+      });
+    } catch (erro) {
+      console.error('Erro na conversão para Base64:', {
+        message: erro.message,
+        stack: erro.stack,
+      }); // DEBUG
+      throw erro;
+    }
   };
 
   const salvarPerfil = async () => {
     if (!usuario) {
+      Alert.alert('Erro', 'Usuário não autenticado.');
       return;
     }
 
     setSalvando(true);
-    try {
-      let uploadedUrl = photoUrl;
+    const timeoutId = setTimeout(() => {
+      console.error('Timeout: salvamento demorou mais de 30 segundos');
+      setSalvando(false);
+      Alert.alert('Erro de Timeout', 'O salvamento está demorando muito. Verifique sua conexão.');
+    }, 30000); // 30 segundos de timeout
 
+    try {
+      console.log('Iniciando salvamento do perfil...'); // DEBUG
+      console.log('Usuário UID:', usuario.uid); // DEBUG
+      
+      let fotoBase64 = photoUrl;
+
+      // Converter imagem para Base64 se houver nova imagem
       if (localImage) {
-        uploadedUrl = await uploadImageAsync(localImage);
+        console.log('Tentando converter imagem para Base64...'); // DEBUG
+        try {
+          fotoBase64 = await convertToBase64(localImage);
+          console.log('Conversão de imagem concluída com sucesso'); // DEBUG
+        } catch (erroConversao) {
+          console.warn('Conversão de imagem falhou, continuando sem foto:', erroConversao.message); // DEBUG
+          fotoBase64 = photoUrl; // Continua com a foto anterior
+          Alert.alert('Aviso', 'Não foi possível atualizar a foto, mas o perfil foi salvo.');
+        }
       }
 
       const nomeCompleto = `${perfil.nome.trim()} ${perfil.sobrenome.trim()}`.trim();
+      console.log('Nome completo:', nomeCompleto); // DEBUG
+      
       const usuarioAtualizado = {};
 
       if (nomeCompleto) usuarioAtualizado.displayName = nomeCompleto;
-      if (uploadedUrl) usuarioAtualizado.photoURL = uploadedUrl;
+      // Nota: Não salvamos Base64 no Auth (muito grande), apenas no Firestore
 
-      if (Object.keys(usuarioAtualizado).length > 0) {
-        await updateProfile(usuario, usuarioAtualizado);
+      if (nomeCompleto) {
+        console.log('Atualizando perfil do Firebase Auth:', usuarioAtualizado); // DEBUG
+        try {
+          await updateProfile(usuario, usuarioAtualizado);
+          console.log('Perfil do Auth atualizado com sucesso'); // DEBUG
+        } catch (erroAuth) {
+          console.error('Erro ao atualizar Auth:', erroAuth.message); // DEBUG
+          // Continua mesmo se Auth falhar
+        }
       }
 
       const perfilRef = doc(bancoDados, 'users', usuario.uid);
       const novosDados = {
-        nome: perfil.nome,
-        sobrenome: perfil.sobrenome,
-        rua: perfil.rua,
-        bairro: perfil.bairro,
-        cidade: perfil.cidade,
-        estado: perfil.estado,
-        cep: perfil.cep,
-        telefone: perfil.telefone,
-        fotoUrl: uploadedUrl || null,
-        updatedAt: new Date(),
+        nome: perfil.nome || '',
+        sobrenome: perfil.sobrenome || '',
+        rua: perfil.rua || '',
+        bairro: perfil.bairro || '',
+        cidade: perfil.cidade || '',
+        estado: perfil.estado || '',
+        cep: perfil.cep || '',
+        telefone: perfil.telefone || '',
+        fotoBase64: fotoBase64 || null,
+        updatedAt: new Date().toISOString(),
       };
 
+      console.log('Dados a salvar no Firestore:', novosDados); // DEBUG
+      console.log('Referência do documento:', `users/${usuario.uid}`); // DEBUG
+      
+      console.log('Iniciando setDoc no Firestore...'); // DEBUG
       await setDoc(perfilRef, novosDados, { merge: true });
+      console.log('Dados salvos no Firestore com sucesso'); // DEBUG
 
       // Atualizar cache local
       const storageKey = `@perfil_usuario_${usuario.uid}`;
       await AsyncStorage.setItem(storageKey, JSON.stringify(novosDados));
+      console.log('Cache local atualizado'); // DEBUG
 
-      setPhotoUrl(uploadedUrl);
+      clearTimeout(timeoutId);
+      setSalvando(false);
+      setPhotoUrl(fotoBase64);
       setLocalImage(null);
       setEditando(false);
       Alert.alert('Sucesso', 'Perfil atualizado com sucesso.');
     } catch (erro) {
-      Alert.alert('Erro', 'Não foi possível salvar o perfil. Tente novamente.');
-    } finally {
+      clearTimeout(timeoutId);
+      console.error('Erro completo ao salvar perfil:', {
+        message: erro.message,
+        code: erro.code,
+        stack: erro.stack,
+      }); // DEBUG
       setSalvando(false);
+      Alert.alert('Erro ao Salvar', `${erro.message || 'Não foi possível salvar o perfil. Tente novamente.'}`);
     }
   };
 
