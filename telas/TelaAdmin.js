@@ -9,10 +9,21 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import {
+  Text,
   TextInput,
   TouchableOpacity,
   View,
+  Image,
+  FlatList,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  StyleSheet,
+  ScrollView,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { bancoDados } from '../config/firebaseConfig';
 
 // === CONSTANTES ===
@@ -125,6 +136,31 @@ export default function TelaAdmin() {
     return null;
   };
 
+  const selecionarImagem = async (campoFoto) => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada', 'Precisamos de permissão para acessar suas fotos.');
+        return;
+      }
+
+      const resultado = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      if (!resultado.canceled) {
+        const uri = resultado.assets[0].uri;
+        atualizarCampo(campoFoto, uri);
+      }
+    } catch (erro) {
+      console.error('Erro ao selecionar imagem:', erro);
+      Alert.alert('Erro', 'Não foi possível selecionar a imagem.');
+    }
+  };
+
   const atualizarCampo = (campo, valor) => {
     setNovoProduto((anterior) => ({ ...anterior, [campo]: valor }));
   };
@@ -165,18 +201,33 @@ export default function TelaAdmin() {
 
     setSalvando(true);
     try {
+      // Formatar preço para padrão brasileiro (R$ 0,00)
+      const precoFormatado = formatarMoeda(novoProduto.Preço);
+      const valoreNormalFormatado = novoProduto.ValorNormal
+        ? formatarMoeda(novoProduto.ValorNormal)
+        : '';
+
+      // Calcular desconto automaticamente
+      const descontoCalculado = calcularDesconto(
+        novoProduto.ValorNormal,
+        novoProduto.Preço
+      );
+
       const fotoFinal = novoProduto.Foto.trim()
         ? novoProduto.Foto
         : 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&auto=format&fit=crop&q=60';
 
       const payload = {
         ...novoProduto,
+        Preço: precoFormatado,
         Foto: fotoFinal,
         Foto2: novoProduto.Foto2.trim(),
         Foto3: novoProduto.Foto3.trim(),
+        Desconto: descontoCalculado || novoProduto.Desconto,
+        ValorNormal: valoreNormalFormatado,
         nome: novoProduto.Produto || '',
-        preco: novoProduto.Preço || '',
-        precoOriginal: novoProduto.ValorNormal || '',
+        preco: precoFormatado || '',
+        precoOriginal: valoreNormalFormatado || '',
         imagem: fotoFinal || '',
       };
 
@@ -210,28 +261,21 @@ export default function TelaAdmin() {
     }
   };
 
-  const deletarProduto = (id, nome) => {
-    Alert.alert(
-      'Confirmar Exclusão',
-      `Deseja realmente deletar o produto "${nome}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(bancoDados, 'produtos', id));
-              Alert.alert('Sucesso', 'Produto removido com sucesso.');
-            } catch (erro) {
-              console.error('Erro ao deletar produto:', erro);
-              Alert.alert('Erro', 'Não foi possível remover o produto.');
-            }
-          },
-        },
-      ]
-    );
-  };
+  const deletarProduto = async (id, nome) => {
+  console.log('Tentando deletar produto:', { id, nome });
+
+  try {
+    console.log('Deletando ID:', id);
+
+    await deleteDoc(doc(bancoDados, 'produtos', id));
+
+    console.log('Produto deletado com sucesso');
+    Alert.alert('Sucesso', 'Produto removido com sucesso.');
+  } catch (erro) {
+    console.error('Erro ao deletar produto:', erro);
+    Alert.alert('Erro', erro.message);
+  }
+};
 
   const popularProdutosPadrao = async () => {
     setCarregando(true);
@@ -254,6 +298,8 @@ export default function TelaAdmin() {
 
   // Renderização
   const renderItem = ({ item }) => {
+    console.log('Renderizando item:', { id: item.id, produto: item.Produto }); // DEBUG
+    
     const desconto =
       item.Desconto ||
       calcularDesconto(item.ValorNormal, item.Preço);
@@ -270,8 +316,11 @@ export default function TelaAdmin() {
         {/* Botão Deletar */}
         <TouchableOpacity
           style={estilos.botaoDeletar}
-          onPress={() => deletarProduto(item.id, item.Produto)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          onPress={() => {
+            console.log('Botão delete pressionado:', item.id); // DEBUG
+            deletarProduto(item.id, item.Produto);
+          }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           accessible={true}
           accessibilityLabel={`Deletar ${item.Produto}`}
         >
@@ -351,7 +400,7 @@ export default function TelaAdmin() {
 
       {/* Formulário */}
       {mostrarFormulario && (
-        <View style={estilos.formulario}>
+        <ScrollView style={estilos.formulario} showsVerticalScrollIndicator={true}>
           <Text style={estilos.tituloFormulario}>
             {editandoId
               ? 'Editar Produto'
@@ -415,41 +464,95 @@ export default function TelaAdmin() {
             />
           </View>
 
-          <TextInput
-            placeholder="URL da Foto Principal"
-            style={estilos.input}
-            value={novoProduto.Foto}
-            onChangeText={(v) => atualizarCampo('Foto', v)}
-            placeholderTextColor="#999"
-          />
+          {/* Foto Principal */}
+          <View style={estilos.secaoFoto}>
+            <Text style={estilos.tituloSecaoFoto}>Foto Principal</Text>
+            <TextInput
+              placeholder="URL da Foto Principal"
+              style={estilos.input}
+              value={novoProduto.Foto}
+              onChangeText={(v) => atualizarCampo('Foto', v)}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              style={estilos.botaoEscolherArquivo}
+              onPress={() => selecionarImagem('Foto')}
+            >
+              <Text style={estilos.textoEscolherArquivo}>📁 Escolher do Arquivo</Text>
+            </TouchableOpacity>
 
-          {/* Prévia da imagem principal */}
-          {novoProduto.Foto && novoProduto.Foto.trim().length > 0 && (
-            <View style={estilos.previewContainer}>
-              <Image
-                source={{ uri: novoProduto.Foto }}
-                style={estilos.previewImage}
-                resizeMode="cover"
-                onError={() => console.warn('Erro ao carregar preview da imagem')}
-              />
-            </View>
-          )}
+            {novoProduto.Foto && novoProduto.Foto.trim().length > 0 && (
+              <View style={estilos.previewContainer}>
+                <Text style={estilos.labelPreview}>Preview:</Text>
+                <Image
+                  source={{ uri: novoProduto.Foto }}
+                  style={estilos.previewImage}
+                  resizeMode="cover"
+                  onError={() => console.warn('Erro ao carregar preview da imagem')}
+                />
+              </View>
+            )}
+          </View>
 
-          <TextInput
-            placeholder="URL da Foto 2 (Opcional)"
-            style={estilos.input}
-            value={novoProduto.Foto2}
-            onChangeText={(v) => atualizarCampo('Foto2', v)}
-            placeholderTextColor="#999"
-          />
+          {/* Foto 2 */}
+          <View style={estilos.secaoFoto}>
+            <Text style={estilos.tituloSecaoFoto}>Foto 2 (Opcional)</Text>
+            <TextInput
+              placeholder="URL da Foto 2"
+              style={estilos.input}
+              value={novoProduto.Foto2}
+              onChangeText={(v) => atualizarCampo('Foto2', v)}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              style={estilos.botaoEscolherArquivo}
+              onPress={() => selecionarImagem('Foto2')}
+            >
+              <Text style={estilos.textoEscolherArquivo}>📁 Escolher do Arquivo</Text>
+            </TouchableOpacity>
 
-          <TextInput
-            placeholder="URL da Foto 3 (Opcional)"
-            style={estilos.input}
-            value={novoProduto.Foto3}
-            onChangeText={(v) => atualizarCampo('Foto3', v)}
-            placeholderTextColor="#999"
-          />
+            {novoProduto.Foto2 && novoProduto.Foto2.trim().length > 0 && (
+              <View style={estilos.previewContainer}>
+                <Text style={estilos.labelPreview}>Preview:</Text>
+                <Image
+                  source={{ uri: novoProduto.Foto2 }}
+                  style={estilos.previewImage}
+                  resizeMode="cover"
+                  onError={() => console.warn('Erro ao carregar preview da foto 2')}
+                />
+              </View>
+            )}
+          </View>
+
+          {/* Foto 3 */}
+          <View style={estilos.secaoFoto}>
+            <Text style={estilos.tituloSecaoFoto}>Foto 3 (Opcional)</Text>
+            <TextInput
+              placeholder="URL da Foto 3"
+              style={estilos.input}
+              value={novoProduto.Foto3}
+              onChangeText={(v) => atualizarCampo('Foto3', v)}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity
+              style={estilos.botaoEscolherArquivo}
+              onPress={() => selecionarImagem('Foto3')}
+            >
+              <Text style={estilos.textoEscolherArquivo}>📁 Escolher do Arquivo</Text>
+            </TouchableOpacity>
+
+            {novoProduto.Foto3 && novoProduto.Foto3.trim().length > 0 && (
+              <View style={estilos.previewContainer}>
+                <Text style={estilos.labelPreview}>Preview:</Text>
+                <Image
+                  source={{ uri: novoProduto.Foto3 }}
+                  style={estilos.previewImage}
+                  resizeMode="cover"
+                  onError={() => console.warn('Erro ao carregar preview da foto 3')}
+                />
+              </View>
+            )}
+          </View>
 
           <TouchableOpacity
             style={[
@@ -469,7 +572,9 @@ export default function TelaAdmin() {
               </Text>
             )}
           </TouchableOpacity>
-        </View>
+
+          <View style={{ height: 20 }} />
+        </ScrollView>
       )}
 
       {/* Conteúdo */}
@@ -567,6 +672,50 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
+  secaoFoto: {
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2E2E2E',
+  },
+  tituloSecaoFoto: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#BEBFC4',
+    marginBottom: 8,
+  },
+  botaoEscolherArquivo: {
+    backgroundColor: '#1F1F1F',
+    borderWidth: 1,
+    borderColor: '#A5151D',
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  textoEscolherArquivo: {
+    color: '#A5151D',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  labelPreview: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#BEBFC4',
+    marginBottom: 8,
+  },
+  previewContainer: {
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2E2E2E',
+    backgroundColor: '#111',
+  },
   botaoSalvar: {
     backgroundColor: '#A5151D',
     padding: 14,
@@ -639,18 +788,6 @@ const estilos = StyleSheet.create({
     width: '100%',
     height: 140,
     backgroundColor: '#1F1F1F',
-  },
-  previewContainer: {
-    marginBottom: 12,
-    alignItems: 'center',
- },
- previewImage: {
-   width: '100%',
-   height: 160,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#2E2E2E',
-    backgroundColor: '#111',
   },
   botaoDeletar: {
     position: 'absolute',

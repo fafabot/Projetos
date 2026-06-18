@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCa6Lok4m7hqC9FGo5oOHpG58WgcVVNx0o",
   authDomain: "keyforge-44aa4.firebaseapp.com",
   projectId: "keyforge-44aa4",
-  storageBucket: "keyforge-44aa4.firebasestorage.app",
+  storageBucket: "keyforge-44aa4.appspot.com",
   messagingSenderId: "678938817723",
   appId: "1:678938817723:web:149243ee01ec6b7d3ae59e"
 };

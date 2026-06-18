@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -8,10 +9,13 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
+import { onSnapshot, collection } from 'firebase/firestore';
+import { bancoDados } from '../config/firebaseConfig';
 import { useFavorites } from '../context/FavoritesContext';
 
-const jogos = [
+const jogosFixos = [
   {
     id: '1',
     nome: 'Cuphead',
@@ -66,6 +70,41 @@ const jogos = [
 export default function TelaProdutos() {
   const navigation = useNavigation();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const [produtosBancoDados, setProdutosBancoDados] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+
+  // Buscar produtos do Firebase
+  useEffect(() => {
+    const produtosRef = collection(bancoDados, 'produtos');
+    const desinscrever = onSnapshot(
+      produtosRef,
+      (querySnapshot) => {
+        const lista = [];
+        querySnapshot.forEach((docSnap) => {
+          const dados = docSnap.data();
+          lista.push({
+            id: docSnap.id,
+            nome: dados.Produto || dados.nome,
+            preco: dados.Preço || dados.preco,
+            precoOriginal: dados.ValorNormal || dados.precoOriginal,
+            imagem: { uri: dados.Foto || dados.imagem },
+            descricao: dados.Descrição || '',
+          });
+        });
+        setProdutosBancoDados(lista);
+        setCarregando(false);
+      },
+      (erro) => {
+        console.error('Erro ao buscar produtos do Firebase:', erro);
+        setCarregando(false);
+      }
+    );
+
+    return desinscrever;
+  }, []);
+
+  // Unificar dados locais com Firebase
+  const todosProdutos = [...jogosFixos, ...produtosBancoDados];
 
   const renderItem = ({ item }) => (
     <View style={estilos.card}>
@@ -118,12 +157,19 @@ export default function TelaProdutos() {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={jogos}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={estilos.listContent}
-        renderItem={renderItem}
-      />
+      {carregando ? (
+        <View style={estilos.carregandoContainer}>
+          <ActivityIndicator size="large" color="#A5151D" />
+          <Text style={estilos.carregandoTexto}>Carregando produtos...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={todosProdutos}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={estilos.listContent}
+          renderItem={renderItem}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -160,6 +206,16 @@ const estilos = StyleSheet.create({
   listContent: {
     paddingHorizontal: 18,
     paddingVertical: 16,
+  },
+  carregandoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  carregandoTexto: {
+    color: '#BEBFC4',
+    fontSize: 14,
+    marginTop: 12,
   },
   card: {
     flexDirection: 'row',

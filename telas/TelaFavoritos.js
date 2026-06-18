@@ -1,5 +1,6 @@
 // === IMPORTS ===
 import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -9,11 +10,14 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
+import { onSnapshot, collection } from 'firebase/firestore';
+import { bancoDados } from '../config/firebaseConfig';
 import { useFavorites } from '../context/FavoritesContext';
 
 // === DADOS ===
-const jogos = [
+const jogosFixos = [
   {
     id: '1',
     nome: 'Cuphead',
@@ -84,10 +88,42 @@ export default function TelaFavoritos() {
   // Hooks
   const navigation = useNavigation();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const [produtosBancoDados, setProdutosBancoDados] = useState([]);
+  const [carregando, setCarregando] = useState(true);
 
-  // Dados
-  const todosProdutos = [...jogos, ...promocoesEspeciais];
-  const favoritos = todosProdutos.filter((jogo) => favorites.includes(jogo.id));
+  // Buscar produtos do Firebase
+  useEffect(() => {
+    const produtosRef = collection(bancoDados, 'produtos');
+    const desinscrever = onSnapshot(
+      produtosRef,
+      (querySnapshot) => {
+        const lista = [];
+        querySnapshot.forEach((docSnap) => {
+          const dados = docSnap.data();
+          lista.push({
+            id: docSnap.id,
+            nome: dados.Produto || dados.nome,
+            descricao: dados.Preço || dados.preco,
+            imagem: { uri: dados.Foto || dados.imagem },
+          });
+        });
+        setProdutosBancoDados(lista);
+        setCarregando(false);
+      },
+      (erro) => {
+        console.error('Erro ao buscar produtos do Firebase:', erro);
+        setCarregando(false);
+      }
+    );
+
+    return desinscrever;
+  }, []);
+
+  // Unificar dados locais com Firebase e filtrar favoritos
+  const todosProdutos = [...jogosFixos, ...promocoesEspeciais, ...produtosBancoDados];
+  const favoritos = todosProdutos.filter((produto) =>
+    favorites.includes(produto.id)
+  );
 
   // Renderização
   return (
@@ -106,7 +142,12 @@ export default function TelaFavoritos() {
       </View>
 
       {/* Conteúdo */}
-      {favoritos.length === 0 ? (
+      {carregando ? (
+        <View style={estilos.centralizado}>
+          <ActivityIndicator size="large" color="#A5151D" />
+          <Text style={estilos.carregandoTexto}>Carregando favoritos...</Text>
+        </View>
+      ) : favoritos.length === 0 ? (
         <View style={estilos.emptyContainer}>
           <Text style={estilos.emptyText}>
             Você ainda não favoritou nenhum jogo.
@@ -120,7 +161,11 @@ export default function TelaFavoritos() {
           renderItem={({ item }) => (
             <View style={estilos.card}>
               <Image
-                source={item.imagem}
+                source={
+                  typeof item.imagem === 'string' || item.imagem.uri
+                    ? item.imagem
+                    : item.imagem
+                }
                 style={estilos.image}
                 resizeMode="cover"
               />
@@ -185,6 +230,16 @@ const estilos = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 13,
+  },
+  centralizado: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  carregandoTexto: {
+    color: '#BEBFC4',
+    fontSize: 14,
+    marginTop: 12,
   },
   emptyContainer: {
     flex: 1,
