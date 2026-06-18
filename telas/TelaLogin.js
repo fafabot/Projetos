@@ -1,5 +1,10 @@
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
+
 import { useState } from 'react';
+
 import {
   KeyboardAvoidingView,
   Platform,
@@ -32,7 +37,36 @@ export default function TelaLogin({ navigation }) {
       navigation.navigate('Home');
     } catch (erro) {
       console.log(erro);
-      setErro('Erro ao fazer login. Verifique seus dados.');
+
+      setErro(
+        'Erro ao fazer login. Verifique seus dados.'
+      );
+    }
+  };
+
+  const redefinirSenha = async () => {
+    if (!email) {
+      setErro(
+        'Digite seu e-mail para redefinir a senha.'
+      );
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(
+        autenticacao,
+        email
+      );
+
+      setErro(
+        'Email de recuperação enviado com sucesso!'
+      );
+    } catch (erro) {
+      console.log(erro);
+
+      setErro(
+        'Erro ao enviar email de recuperação.'
+      );
     }
   };
 
@@ -40,7 +74,11 @@ export default function TelaLogin({ navigation }) {
     <SafeAreaView style={estilos.safeArea}>
       <KeyboardAvoidingView
         style={estilos.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
         <StatusBar
           barStyle="light-content"
@@ -100,6 +138,15 @@ export default function TelaLogin({ navigation }) {
                 onChangeText={setSenha}
               />
 
+              <TouchableOpacity
+                onPress={redefinirSenha}
+                style={estilos.forgotPassword}
+              >
+                <Text style={estilos.forgotPasswordText}>
+                  Esqueceu a senha?
+                </Text>
+              </TouchableOpacity>
+
               {erro ? (
                 <Text style={estilos.erro}>
                   {erro}
@@ -126,7 +173,8 @@ export default function TelaLogin({ navigation }) {
                   }
                 >
                   <Text style={estilos.loginLink}>
-                    {' '}Cadastre-se
+                    {' '}
+                    Cadastre-se
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -232,6 +280,17 @@ const estilos = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#1F1F1F',
+  },
+
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginTop: -8,
+    marginBottom: 15,
+  },
+
+  forgotPasswordText: {
+    color: '#BEBFC4',
+    fontSize: 13,
   },
 
   button: {
