@@ -361,10 +361,3 @@ footer { background: #050505; padding: 80px 0 20px; border-top: 1px solid #222; 
 
     .footer-content { grid-template-columns: 1fr; }
 }
-
-/* Animações Scroll Reveal */
-.reveal-fade { opacity: 0; transition: 1s all ease; }
-.reveal-slide-up { opacity: 0; transform: translateY(50px); transition: 1s all ease; }
-.reveal-slide-left { opacity: 0; transform: translateX(-50px); transition: 1s all ease; }
-
-.active-reveal { opacity: 1; transform: translate(0, 0); }
